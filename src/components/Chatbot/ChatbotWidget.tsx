@@ -48,28 +48,61 @@ export const ChatbotWidget = () => {
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI response with sales-oriented answers
-    setTimeout(() => {
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: getAIResponse(inputValue),
-        isBot: true,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, botMessage]);
-      setIsTyping(false);
+    // Get AI response using Gemini
+    setTimeout(async () => {
+      try {
+        const responseText = await getAIResponse(inputValue);
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: responseText,
+          isBot: true,
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, botMessage]);
+      } catch (error) {
+        console.error('Error getting AI response:', error);
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: 'Elnézést, pillanatnyilag nem tudok válaszolni. Kérlek, próbáld újra később! 🔄',
+          isBot: true,
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, errorMessage]);
+      } finally {
+        setIsTyping(false);
+      }
     }, 1500);
   };
 
-  const getAIResponse = (userInput: string): string => {
+  const getAIResponse = async (userInput: string): Promise<string> => {
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      
+      const { data, error } = await supabase.functions.invoke('gemini-chat', {
+        body: { message: userInput }
+      });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        return getFallbackResponse(userInput);
+      }
+
+      return data?.response || getFallbackResponse(userInput);
+    } catch (error) {
+      console.error('Error calling Gemini:', error);
+      return getFallbackResponse(userInput);
+    }
+  };
+
+  const getFallbackResponse = (userInput: string): string => {
     const input = userInput.toLowerCase();
     
     if (input.includes('program') || input.includes('menetrend') || input.includes('időpont')) {
-      return 'Az AI Talks konferencia gazdag programmal várja a résztvevőket! Reggel 9:00-tól délután 17:00-ig tartunk előadásokat, kerekasztal-beszélgetéseket és networking lehetőségeket. A teljes programot megtekintheted a weboldalunkon. Szeretnéd megtudni a jegyáraink is? 💼';
+      return 'Az AI Talks konferencia gazdag programmal várja a résztvevőket! Reggel 9:00-tól délután 17:00-ig tartunk előladásokat, kerekasztal-beszélgetéseket és networking lehetőségeket. A teljes programot megtekintheted a weboldalunkon. Szeretnéd megtudni a jegyáraink is? 💼';
     }
     
     if (input.includes('előadó') || input.includes('speaker')) {
-      return 'Fantasztikus előadókat hívtunk meg! AI szakértők, technológiai vezetők és innovációs guruk tartanak előadást. Mindegyikük saját területének elismert szakembere. Az ilyen minőségű előadásokat ritkán hallhatod egy helyen - ez egyedülálló lehetőség! Érdekelnek a jegy opciók? 🚀';
+      return 'Fantasztikus előladókat hívtunk meg! AI szakértők, technológiai vezetők és innovációs guruk tartanak előladást. Mindegyikük saját területének elismert szakembere. Az ilyen minőségű előladásokat ritkán hallhatod egy helyen - ez egyedülálló lehetőség! Érdekelnek a jegy opciók? 🚀';
     }
     
     if (input.includes('jegy') || input.includes('ár') || input.includes('költség')) {
@@ -89,7 +122,7 @@ export const ChatbotWidget = () => {
     }
 
     // Default sales-oriented response
-    return 'Köszönöm a kérdésed! Az AI Talks konferencia minden részletéről szívesen tájékoztatlak. Ez egy egyedülálló lehetőség, hogy felzárkózz az AI trendekhez és értékes kapcsolatokat építs. Van konkrét kérdésed a programról, előadókról vagy jegyekről? Segítek megtalálni a számodra ideális opciot! ✨';
+    return 'Köszönöm a kérdésed! Az AI Talks konferencia minden részletéről szívesen tájékoztatlak. Ez egy egyedülálló lehetőség, hogy felzárkózz az AI trendekhez és értékes kapcsolatokat építs. Van konkrét kérdésed a programról, előladókról vagy jegyekről? Segítek megtalálni a számodra ideális opciot! ✨';
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
