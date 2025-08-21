@@ -136,17 +136,17 @@ export const ChatbotWidget = () => {
     <div className="fixed bottom-6 right-6 z-50">
       {/* Chat Window */}
       {isOpen && (
-        <Card className="mb-4 w-96 h-[500px] flex flex-col shadow-chatbot bg-gradient-subtle border-primary/20">
+        <Card className="mb-4 w-96 h-[500px] flex flex-col shadow-chatbot border-primary/20" style={{ background: 'var(--gradient-chatbot-spiral)' }}>
           {/* Header */}
-          <div className="flex items-center justify-between p-4 bg-gradient-primary text-primary-foreground rounded-t-lg">
+          <div className="flex items-center justify-between p-4 bg-white/20 backdrop-blur-sm text-purple-900 rounded-t-lg border-b border-white/30">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
               <span className="font-semibold">AI Talks Asszisztens</span>
             </div>
             <Button 
               variant="ghost" 
               size="sm"
-              className="text-primary-foreground hover:bg-white/20"
+              className="text-purple-900 hover:bg-white/30"
               onClick={() => setIsOpen(false)}
             >
               <X className="h-4 w-4" />
@@ -167,12 +167,12 @@ export const ChatbotWidget = () => {
                   className={cn(
                     'max-w-[80%] p-3 rounded-lg transition-smooth',
                     message.isBot
-                      ? 'bg-chatbot-message-bot text-foreground border border-border'
-                      : 'bg-chatbot-message-user text-primary-foreground'
+                      ? 'bg-white/80 backdrop-blur-sm text-purple-900 border border-white/40 shadow-sm'
+                      : 'bg-purple-800/90 backdrop-blur-sm text-white border border-purple-600/40'
                   )}
                 >
-                  <p className="text-sm leading-relaxed">{message.text}</p>
-                  <span className="text-xs opacity-70 mt-1 block">
+                  <p className="text-sm leading-relaxed font-medium">{message.text}</p>
+                  <span className="text-xs opacity-60 mt-1 block">
                     {message.timestamp.toLocaleTimeString('hu-HU', {
                       hour: '2-digit',
                       minute: '2-digit'
@@ -185,11 +185,11 @@ export const ChatbotWidget = () => {
             {/* Typing indicator */}
             {isTyping && (
               <div className="flex justify-start">
-                <div className="bg-chatbot-message-bot border border-border p-3 rounded-lg">
+                <div className="bg-white/80 backdrop-blur-sm border border-white/40 p-3 rounded-lg shadow-sm">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                   </div>
                 </div>
               </div>
@@ -198,14 +198,14 @@ export const ChatbotWidget = () => {
           </div>
 
           {/* Input */}
-          <div className="p-4 border-t border-border">
+          <div className="p-4 border-t border-white/30">
             <div className="flex gap-2">
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Kérdezz bármit az AI Talks-ról..."
-                className="flex-1 transition-smooth focus:shadow-elegant"
+                className="flex-1 bg-white/90 backdrop-blur-sm border-white/40 text-purple-900 placeholder:text-purple-600 focus:border-primary transition-smooth"
               />
               <Button 
                 onClick={handleSendMessage}

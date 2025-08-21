@@ -53,6 +53,8 @@
     --gradient-primary: linear-gradient(135deg, hsl(120 100% 50%), hsl(140 100% 40%));
     --gradient-hero: linear-gradient(135deg, hsl(120 100% 50%) 0%, hsl(140 100% 40%) 100%);
     --gradient-subtle: linear-gradient(180deg, hsl(260 25% 8%) 0%, hsl(260 25% 10%) 100%);
+    --gradient-chatbot: linear-gradient(135deg, hsl(120 80% 85%) 0%, hsl(140 70% 80%) 50%, hsl(160 60% 75%) 100%);
+    --gradient-chatbot-spiral: radial-gradient(circle at 30% 20%, hsl(120 70% 80%) 0%, transparent 50%), radial-gradient(circle at 70% 80%, hsl(140 60% 85%) 0%, transparent 50%), linear-gradient(135deg, hsl(120 80% 88%) 0%, hsl(140 70% 82%) 100%);
 
     /* Shadows */
     --shadow-chatbot: 0 20px 60px -10px hsl(120 100% 50% / 0.4);
