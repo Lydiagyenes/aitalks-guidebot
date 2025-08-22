@@ -17,7 +17,7 @@ export const ChatbotWidget = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Szia! Én vagyok az AI Talks asszisztensed. Segítek minden kérdésben a konferenciával kapcsolatban. Miben segíthetek? 🎯',
+      text: 'Szia! Én vagyok az AI Talks asszisztensed! 🤖 November 20-án várunk a Bálna Budapestben, ahol a HVG & Amazing AI bemutatja, hogyan válhat az AI a te üzleti versenyelőnyeddé. Miben segíthetek? Jegyek, program, workshopok? 🚀',
       isBot: true,
       timestamp: new Date()
     }
@@ -97,32 +97,40 @@ export const ChatbotWidget = () => {
   const getFallbackResponse = (userInput: string): string => {
     const input = userInput.toLowerCase();
     
-    if (input.includes('program') || input.includes('menetrend') || input.includes('időpont')) {
-      return 'Az AI Talks konferencia gazdag programmal várja a résztvevőket! Reggel 9:00-tól délután 17:00-ig tartunk előladásokat, kerekasztal-beszélgetéseket és networking lehetőségeket. A teljes programot megtekintheted a weboldalunkon. Szeretnéd megtudni a jegyáraink is? 💼';
+    if (input.includes('program') || input.includes('menetrend') || input.includes('időpont') || input.includes('mikor')) {
+      return 'Az AI Talks 2025. november 20-án kerül megrendezésre, 11:00-22:00 között a Bálna Budapestben! Délelőtt inspiráló előadások, délután praktikus workshopok várnak. Három szinten választhatsz: Solo, Team vagy Enterprise magic. Szeretnéd megtudni a jegyáraink is? 💼';
     }
     
-    if (input.includes('előadó') || input.includes('speaker')) {
-      return 'Fantasztikus előladókat hívtunk meg! AI szakértők, technológiai vezetők és innovációs guruk tartanak előladást. Mindegyikük saját területének elismert szakembere. Az ilyen minőségű előladásokat ritkán hallhatod egy helyen - ez egyedülálló lehetőség! Érdekelnek a jegy opciók? 🚀';
+    if (input.includes('előadó') || input.includes('speaker') || input.includes('ki beszél')) {
+      return 'Fantasztikus előadókat hívtunk meg! Például Tomas Snazyk (CEO, Startup Poland) és más AI szakértők, akik valós, működő megoldásokat mutatnak be. Nem elméletet, hanem azonnal alkalmazható tudást kapsz! Érdekelnek a jegy opciók? 🚀';
     }
     
-    if (input.includes('jegy') || input.includes('ár') || input.includes('költség')) {
-      return 'Kiváló kérdés! Különböző jegytípusaink vannak: Early Bird (29.900 Ft), Standard (39.900 Ft) és VIP (59.900 Ft). A VIP jegy külön networking eseményt és meetup lehetőséget is tartalmaz! A helyek limitáltak, érdemes mielőbb foglalni. Segítek a jegyvásárlásban? 🎟️';
+    if (input.includes('jegy') || input.includes('ár') || input.includes('költség') || input.includes('mennyibe')) {
+      return 'Háromféle jegytípusunk van kedvezménnyel: BASIC 39.900 Ft+ÁFA (eredeti 49.900 Ft), PRÉMIUM 139.900 Ft+ÁFA (videófelvételekkel), VIP 169.900 Ft+ÁFA (VIP lounge, networking az előadókkal). A kedvezmény augusztus 31-ig él! Melyik érdekel? 🎟️';
     }
     
-    if (input.includes('helyszín') || input.includes('hol') || input.includes('cím')) {
-      return 'A konferencia Budapesten kerül megrendezésre, könnyu megközelítéssel a belvárosban. A pontos helyszín információkat a jegyvásárlás után küldjük el. Tömegközlekedéssel és autóval is remekül elérhető! Foglaljunk helyet neked? 📍';
+    if (input.includes('helyszín') || input.includes('hol') || input.includes('cím') || input.includes('bálna')) {
+      return 'A konferencia a Bálna Budapestben lesz, a Fővám tér 11-12. szám alatt. Fantasztikus helyszín a Duna-parton, könnyen megközelíthető tömegközlekedéssel és autóval is! November 20-án, 11:00-22:00. Foglaljunk helyet neked? 📍';
     }
     
-    if (input.includes('networking') || input.includes('kapcsolat')) {
-      return 'Remek, hogy érdekel a networking! Az AI Talks-on nemcsak tanulhatsz, hanem értékes kapcsolatokat is építhetsz. Kávészünetek, ebédpauza és külön networking szekció is lesz. A VIP jeggyel még exkluzív meetup lehetőség is jár! Melyik jegytípus érdekel? 🤝';
+    if (input.includes('networking') || input.includes('kapcsolat') || input.includes('ismerkedés')) {
+      return 'Remek, hogy érdekel a networking! A VIP jeggyel zártkörű kapcsolatépítő találkozó az előadókkal és kiállítókkal, VIP lounge külön cateringgel. De minden jegytípusnál van lehetőség kapcsolatépítésre! Melyik jegytípus érdekel? 🤝';
     }
     
-    if (input.includes('miért') || input.includes('érdemes') || input.includes('előny')) {
-      return 'Fantasztikus kérdés! Az AI Talks-on a legfrissebb trendeket ismerheted meg, értékes kapcsolatokat építhetsz és konkrét tudást szerezhetsz, amit azonnal alkalmazhatsz. Plus: certificatet is kapsz a részvételről! Ez egy befektetés a jövődbe. Biztosítsuk a helyed? 💡';
+    if (input.includes('miért') || input.includes('érdemes') || input.includes('előny') || input.includes('haszon')) {
+      return 'Az AI Talks egyedülálló! HVG & Amazing AI közös rendezvény, 70.000+ embernek már segítettek. Nem elméletet kapsz, hanem másnap már használható tudást. Valós esettanulmányok, működő workflow-k, AI-ügynökök építése. Ez befektetés a jövődbe! 💡';
+    }
+
+    if (input.includes('workshop') || input.includes('műhely') || input.includes('gyakorlat')) {
+      return 'Délután három párhuzamos workshop-útvonal: Solo magic (egyéni hatékonyság), Team magic (csapat szintű AI), Enterprise magic (vállalatirányítási szint). A helyszínen választhatsz, melyik a legmegfelelőbb számodra! 🛠️';
+    }
+
+    if (input.includes('hvg') || input.includes('amazing') || input.includes('szervező')) {
+      return 'Az AI Talks a HVG (45+ éves médiatapasztalat) és az Amazing AI (70.000+ ember képzése) stratégiai szövetsége. Két hiteles szereplő garantálja a prémium minőséget és a gyakorlatias megközelítést! 🏆';
     }
 
     // Default sales-oriented response
-    return 'Köszönöm a kérdésed! Az AI Talks konferencia minden részletéről szívesen tájékoztatlak. Ez egy egyedülálló lehetőség, hogy felzárkózz az AI trendekhez és értékes kapcsolatokat építs. Van konkrét kérdésed a programról, előladókról vagy jegyekről? Segítek megtalálni a számodra ideális opciot! ✨';
+    return 'Köszönöm a kérdésed! Az AI Talks november 20-án vár a Bálna Budapestben - ez egy egyedülálló lehetőség, hogy az AI-t valódi versenyelőnnyé alakítsd. Van konkrét kérdésed a programról, jegyekről vagy workshopokról? Segítek megtalálni a számodra ideális opciót! ✨';
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
