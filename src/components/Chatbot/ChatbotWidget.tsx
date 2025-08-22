@@ -144,17 +144,20 @@ export const ChatbotWidget = () => {
     <div className="fixed bottom-6 right-6 z-50">
       {/* Chat Window */}
       {isOpen && (
-        <Card className="mb-4 w-96 h-[500px] flex flex-col shadow-chatbot border-primary/20" style={{ background: 'var(--gradient-chatbot-spiral)' }}>
+        <Card className="mb-4 w-96 h-[500px] flex flex-col shadow-chatbot border-primary/30 bg-gradient-chatbot backdrop-blur-xl">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 bg-white/20 backdrop-blur-sm text-purple-900 rounded-t-lg border-b border-white/30">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-              <span className="font-semibold">AI Talks Asszisztens</span>
+          <div className="flex items-center justify-between p-4 bg-card border-b border-primary/20 rounded-t-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 bg-primary rounded-full animate-pulse shadow-sm shadow-primary/50"></div>
+              <div>
+                <span className="font-bold text-foreground text-sm">AI Talks</span>
+                <div className="text-xs text-muted-foreground">Asszisztens</div>
+              </div>
             </div>
             <Button 
               variant="ghost" 
               size="sm"
-              className="text-purple-900 hover:bg-white/30"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted/50 h-8 w-8 p-0"
               onClick={() => setIsOpen(false)}
             >
               <X className="h-4 w-4" />
@@ -173,14 +176,17 @@ export const ChatbotWidget = () => {
               >
                 <div
                   className={cn(
-                    'max-w-[80%] p-3 rounded-lg transition-smooth',
+                    'max-w-[80%] p-3 rounded-xl transition-smooth',
                     message.isBot
-                      ? 'bg-white/80 backdrop-blur-sm text-purple-900 border border-white/40 shadow-sm'
-                      : 'bg-purple-800/90 backdrop-blur-sm text-white border border-purple-600/40'
+                      ? 'bg-card text-foreground border border-primary/20 shadow-sm'
+                      : 'bg-primary text-primary-foreground shadow-md shadow-primary/25'
                   )}
                 >
                   <p className="text-sm leading-relaxed font-medium">{message.text}</p>
-                  <span className="text-xs opacity-60 mt-1 block">
+                  <span className={cn(
+                    "text-xs mt-1 block",
+                    message.isBot ? "text-muted-foreground" : "text-primary-foreground/70"
+                  )}>
                     {message.timestamp.toLocaleTimeString('hu-HU', {
                       hour: '2-digit',
                       minute: '2-digit'
@@ -193,11 +199,11 @@ export const ChatbotWidget = () => {
             {/* Typing indicator */}
             {isTyping && (
               <div className="flex justify-start">
-                <div className="bg-white/80 backdrop-blur-sm border border-white/40 p-3 rounded-lg shadow-sm">
+                <div className="bg-card border border-primary/20 p-3 rounded-xl shadow-sm">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                   </div>
                 </div>
               </div>
@@ -206,19 +212,19 @@ export const ChatbotWidget = () => {
           </div>
 
           {/* Input */}
-          <div className="p-4 border-t border-white/30">
+          <div className="p-4 border-t border-primary/20">
             <div className="flex gap-2">
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Kérdezz bármit az AI Talks-ról..."
-                className="flex-1 bg-white/90 backdrop-blur-sm border-white/40 text-purple-900 placeholder:text-purple-600 focus:border-primary transition-smooth"
+                className="flex-1 bg-muted/50 border-primary/30 text-foreground placeholder:text-muted-foreground focus:border-primary focus:bg-muted/70 transition-smooth"
               />
               <Button 
                 onClick={handleSendMessage}
                 disabled={!inputValue.trim()}
-                className="bg-gradient-primary hover:shadow-glow transition-smooth"
+                className="bg-gradient-primary hover:shadow-glow transition-smooth disabled:opacity-50"
               >
                 <Send className="h-4 w-4" />
               </Button>
@@ -233,8 +239,8 @@ export const ChatbotWidget = () => {
         className={cn(
           'h-14 w-14 rounded-full shadow-chatbot transition-bounce',
           isOpen 
-            ? 'bg-muted hover:bg-muted/80' 
-            : 'bg-gradient-primary hover:shadow-glow'
+            ? 'bg-card border border-primary/30 text-foreground hover:bg-muted/80' 
+            : 'bg-gradient-primary text-primary-foreground hover:shadow-glow'
         )}
       >
         {isOpen ? (

@@ -6,30 +6,30 @@
 
 @layer base {
   :root {
-    /* Base colors - Dark purple theme for AI Talks */
-    --background: 260 25% 8%;
-    --foreground: 120 100% 85%;
+    /* AI Talks Brand Colors - Exact match */
+    --background: 240 35% 11%;  /* #1a1b3e - Dark navy purple */
+    --foreground: 0 0% 98%;     /* #fafafa - Clean white */
 
     /* Card components */
-    --card: 260 25% 10%;
-    --card-foreground: 120 100% 85%;
+    --card: 240 35% 13%;        /* Slightly lighter navy */
+    --card-foreground: 0 0% 98%;
 
-    --popover: 260 25% 10%;
-    --popover-foreground: 120 100% 85%;
+    --popover: 240 35% 13%;
+    --popover-foreground: 0 0% 98%;
 
-    /* Brand colors - Neon green palette */
-    --primary: 120 100% 50%;
-    --primary-foreground: 260 25% 8%;
-    --primary-glow: 120 100% 60%;
+    /* AI Talks Brand Colors */
+    --primary: 78 100% 52%;     /* #9AE600 - Bright lime green */
+    --primary-foreground: 240 35% 11%;
+    --primary-glow: 78 100% 62%; /* Lighter lime for glow */
 
-    --secondary: 260 25% 15%;
-    --secondary-foreground: 120 100% 85%;
+    --secondary: 240 35% 15%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 260 25% 12%;
-    --muted-foreground: 120 30% 70%;
+    --muted: 240 35% 16%;
+    --muted-foreground: 0 0% 70%;
 
-    --accent: 120 100% 50%;
-    --accent-foreground: 260 25% 8%;
+    --accent: 78 100% 52%;      /* Same as primary */
+    --accent-foreground: 240 35% 11%;
 
     /* Status colors */
     --success: 120 100% 50%;
@@ -43,23 +43,24 @@
     --input: 260 25% 15%;
     --ring: 120 100% 50%;
 
-    /* Chatbot specific colors */
-    --chatbot-bg: 120 100% 50%;
-    --chatbot-message-user: 120 100% 50%;
-    --chatbot-message-bot: 260 25% 12%;
-    --chatbot-shadow: 120 100% 15%;
+    /* AI Talks Chatbot Colors */
+    --chatbot-bg: 240 35% 11%;
+    --chatbot-header: 240 35% 13%;
+    --chatbot-user-message: 78 100% 52%;
+    --chatbot-bot-message: 240 35% 16%;
+    --chatbot-shadow: 78 100% 15%;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(120 100% 50%), hsl(140 100% 40%));
-    --gradient-hero: linear-gradient(135deg, hsl(120 100% 50%) 0%, hsl(140 100% 40%) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(260 25% 8%) 0%, hsl(260 25% 10%) 100%);
-    --gradient-chatbot: linear-gradient(135deg, hsl(120 80% 85%) 0%, hsl(140 70% 80%) 50%, hsl(160 60% 75%) 100%);
-    --gradient-chatbot-spiral: radial-gradient(circle at 30% 20%, hsl(120 70% 80%) 0%, transparent 50%), radial-gradient(circle at 70% 80%, hsl(140 60% 85%) 0%, transparent 50%), linear-gradient(135deg, hsl(120 80% 88%) 0%, hsl(140 70% 82%) 100%);
+    /* AI Talks Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(78 100% 52%), hsl(78 100% 42%));
+    --gradient-hero: linear-gradient(135deg, hsl(78 100% 52%) 0%, hsl(78 100% 42%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(240 35% 11%) 0%, hsl(240 35% 13%) 100%);
+    --gradient-chatbot: linear-gradient(135deg, hsl(240 35% 13%) 0%, hsl(240 35% 16%) 50%, hsl(240 35% 18%) 100%);
+    --gradient-chatbot-modern: linear-gradient(135deg, hsl(240 35% 13%) 0%, hsl(240 35% 15%) 100%);
 
-    /* Shadows */
-    --shadow-chatbot: 0 20px 60px -10px hsl(120 100% 50% / 0.4);
-    --shadow-elegant: 0 10px 30px -10px hsl(120 100% 50% / 0.3);
-    --shadow-glow: 0 0 40px hsl(120 100% 50% / 0.6);
+    /* AI Talks Shadows */
+    --shadow-chatbot: 0 20px 60px -10px hsl(78 100% 52% / 0.3);
+    --shadow-elegant: 0 10px 30px -10px hsl(78 100% 52% / 0.25);
+    --shadow-glow: 0 0 40px hsl(78 100% 52% / 0.4);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
