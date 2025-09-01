@@ -131,7 +131,8 @@ VÁLASZADÁSI STÍLUS:
 - Minden válasz végén próbáld a jegyvásárlás felé terelni
 - Használj magyaros kifejezéseket és emoji-kat mértékkel
 - Legyen rövid és lényegretörő
-- Ha nem vagy biztos valamiben, irányítsd a https://aitalks.hu/ oldalra
+- NE használj linkeket, mert a chatbot az AI Talks weboldalán lesz beágyazva
+- Ha nem vagy biztos valamiben, általános segítséget ajánlj
 
 Válaszolj magyarul a következő kérdésre/üzenetre:`;
 
