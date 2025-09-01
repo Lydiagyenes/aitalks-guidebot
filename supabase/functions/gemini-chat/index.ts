@@ -91,12 +91,37 @@ KIEGÉSZÍTŐ TUDÁSBÁZIS (faktuális kérdésekhez válaszolj ezek alapján):
 - Csonka Zsolt (Amazing AI): Copywriter 2.0 – AI-karmesteri szemlélet.
 - Sabján László & Kertvéllesy András (AI Squad): Voice AI az ügyfélszolgálatban.
 
-6) Cégek – röviden
-- Make.com: vizuális, no-code automatizáció; AI Agentek.
-- grupoQ / Qconcursos: 35M+ felhasználó, vizsgafelkészítő ökoszisztéma.
-- Amazing AI: AI tanácsadás, képzések, automatizációs projektek.
-- HVG: Tech+Tudomány, minőségi tartalom, társszervező.
-- Tengr.ai: képgeneráló platform, Hyperalign™, üzleti csomagok.
+6) Cégek – részletesen
+- Make.com: vizuális, no-code automatizáció; AI Agentek; 2500+ integráció; drag-and-drop folyamatábra; komplex logikai feltételek; valós idejű monitoring.
+- grupoQ / Qconcursos: 35M+ felhasználó, vizsgafelkészítő ökoszisztéma; Brazília legnagyobb edtech; Caio Moretti vezeti.
+- Amazing AI: AI tanácsadás, képzések, automatizációs projektek; Németh Gábor társalapítója; Stylers Group partnerség.
+- HVG: Magyarország egyik legmeghatározóbb független hírforrása (1979); 1,5M ember/hét; Tech+Tudomány rovat; főszervező; minőségi újságírás.
+- Tengr.ai: W. Szabó Péter képgeneráló platformja; Hyperalign™ technológia; 100% felhasználói tulajdonjog; üzleti csomagok; privacy-by-design.
+
+7) No-code automatizálás eszközök (Lukács Bence workshopjához)
+- Zapier: "trigger-action" logika; 6000+ integráció; egyszerű, lineáris folyamatok; kezdőknek ideális.
+- n8n: vizuális, node-alapú szerkesztő; rugalmas, komplex logika; nyílt forráskódú; saját szerverre telepíthető; összetettebb automatizációkhoz.
+
+8) IDŐTERV - KRITIKUS: Ne ajánlj egymással ütköző programokat!
+DÉLELŐTTI ELŐADÁSOK:
+09:05-09:25: Lisa Kleinman (Make.com) - No-code munkafolyamatok
+09:27-09:47: Caio Moretti (QConcursos) - Vibe-coding
+09:49-10:09: Németh Gábor (Amazing AI) - AI Fluency
+10:11-10:31: Balogh Csaba (HVG) - 2025 AI-történései, 2026 trendek
+10:31-10:51: Kerekasztal (Koltai Balázs moderátor, Laczkó Gábor, Deliága Ákos)
+10:51-11:11: W. Szabó Péter (Tengr.ai) - Autonóm ügynökök
+11:45-12:15: Szauder Dávid (MOME) - AI-művészet
+
+DÉLUTÁNI WORKSHOPOK (párhuzamosak):
+13:15-14:15: Lukács Bence - No-code automatizáció (1 óra)
+13:15-14:45: Németh Gábor - AI-csapatom (1,5 óra, Görgei terem)
+13:15-14:45: Pásti Edina - Vizuális anyagok AI-jal (1,5 óra)
+13:15-14:45: Laczkó Gábor & Tiszavölgyi Péter - AI stratégia 5 lépésben (1,5 óra)
+
+15:15-16:45: Drobny-Burján Andrea - Kódolt kreativitás (1,5 óra)
+15:15-16:45: Tóth-Czere Péter - Human 2.0 (1,5 óra)
+15:15-16:45: Csonka Zsolt - Copywriter 2.0 (1,5 óra)
+15:15-16:45: Sabján László & Kertvéllesy András - Voice AI (1,5 óra)
 
 VÁLASZADÁSI STÍLUS:
 - Legyen lelkes, professzionális és sales-orientált
