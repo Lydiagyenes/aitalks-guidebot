@@ -17,7 +17,7 @@ export const ChatbotWidget = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Szia! Én vagyok az AI Talks asszisztensed! 🤖 2025. szeptember 3-án várunk Budapesten. Miben segíthetek? Jegyek, program, workshopok, parkolás, éttermek? 🚀',
+      text: 'Szia! Én vagyok az AI Talks asszisztensed! 🤖 Jegyvásárlás szeptember 3-án nyílik, konferencia november 20-án lesz Budapesten. Miben segíthetek? Jegyek, program, workshopok, parkolás, éttermek? 🚀',
       isBot: true,
       timestamp: new Date()
     }
@@ -99,7 +99,7 @@ export const ChatbotWidget = () => {
 
     // Program / időpont
     if (input.includes('program') || input.includes('menetrend') || input.includes('időpont') || input.includes('mikor')) {
-      return 'Az AI Talks 2025. szeptember 3-án lesz Budapesten. Délelőtt előadások, délután párhuzamos, gyakorlati workshopok. Kérsz ajánlást, melyik program lenne számodra a leghasznosabb? 💼';
+      return 'Az AI Talks jegyvásárlása szeptember 3-án nyílik, a konferencia november 20-án lesz Budapesten. Délelőtt előadások, délután párhuzamos, gyakorlati workshopok. Kérsz ajánlást, melyik program lenne számodra a leghasznosabb? 💼';
     }
 
     // Előadók
@@ -158,7 +158,7 @@ export const ChatbotWidget = () => {
     }
 
     // Alapértelmezett, sales-orientált válasz
-    return 'Köszönöm a kérdésed! Az AI Talks 2025. szeptember 3-án indul Budapesten – korlátozott idejű kedvezményekkel. Melyik témáról küldjek részletes infót: jegyek, program, workshopok, parkolás vagy éttermek? ✨';
+    return 'Köszönöm a kérdésed! Az AI Talks jegyvásárlása szeptember 3-án nyílik, a konferencia november 20-án lesz Budapesten – korlátozott idejű kedvezményekkel. Melyik témáról küldjek részletes infót: jegyek, program, workshopok, parkolás vagy éttermek? ✨';
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

@@ -29,15 +29,17 @@ serve(async (req) => {
 
 INFORMÁCIÓK A KONFERENCIÁRÓL:
 - Név: AI TALKS by HVG & Amazing AI
-- Időpont: 2025. szeptember 3.
+- Jegyvásárlás nyitás: 2025. szeptember 3. - ekkor kezdődik a jegyvásárlás!
+- Rendezvény időpontja: 2025. november 20. - ez a tényleges konferencia napja
 - Helyszín: Budapest (pontos helyszín hamarosan)
 - Szervezők: HVG & Amazing AI
 - Téma: "Az AI mint üzlettárs: szemléletváltó konferencia az új korszak vezetőinek"
-- Státusz: A visszaszámlálás elkezdődött! Ez lesz a legnagyobb AI nyitónapja a lehetőségekkel
+- Státusz: A visszaszámlálás elkezdődött! Szeptember 3-án nyílik a jegyvásárlás
 - Fő üzenet: "Ne maradj le a startról!"
 
 AKTUÁLIS HELYZET:
-- A visszaszámlálás folyamatban van
+- Szeptember 3-án nyílik a jegyvásárlás - ez csak a jegyértékesítés kezdete!
+- A tényleges konferencia november 20-án lesz
 - Ez az AI mint üzlettárs szemléletváltó konferenciája
 - Az új korszak vezetőinek szól
 - A legnagyobb kedvezményekkel várják a résztvevőket
@@ -176,7 +178,7 @@ Válaszolj magyarul a következő kérdésre/üzenetre:`;
     console.error('Error in gemini-chat function:', error);
     
     // Fallback válasz ha a Gemini nem elérhető
-    const fallbackResponse = 'Köszönöm a kérdésed! Az AI TALKS szeptember 3-án indul Budapesten - ez egy egyedülálló lehetőség, hogy az AI-t valódi üzlettársaddá alakítsd! A visszaszámlálás már elkezdődött, ne maradj le a startról! Van konkrét kérdésed a programról, korai madár jegyekről vagy a konferenciáról? Segítek megtalálni a számodra ideális opciót! ✨';
+    const fallbackResponse = 'Köszönöm a kérdésed! Az AI TALKS jegyvásárlása szeptember 3-án nyílik, a konferencia pedig november 20-án lesz Budapesten - ez egy egyedülálló lehetőség, hogy az AI-t valódi üzlettársaddá alakítsd! A visszaszámlálás már elkezdődött, ne maradj le a startról! Van konkrét kérdésed a programról, korai madár jegyekről vagy a konferenciáról? Segítek megtalálni a számodra ideális opciót! ✨';
     
     return new Response(JSON.stringify({ response: fallbackResponse }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
