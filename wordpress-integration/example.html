@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Talks Chatbot - WordPress Integration Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2563eb;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .demo-controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+        }
+        .demo-controls h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .control-group select,
+        .control-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .control-group button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .control-group button:hover {
+            background: #1d4ed8;
+        }
+        .control-group button.destroy {
+            background: #dc2626;
+        }
+        .control-group button.destroy:hover {
+            background: #b91c1c;
+        }
+        .code-example {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        .code-example pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .integration-steps {
+            background: #ecfccb;
+            border: 1px solid #bef264;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .integration-steps h3 {
+            color: #365314;
+            margin-top: 0;
+        }
+        .integration-steps ol {
+            color: #4d7c0f;
+        }
+        .integration-steps ol li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 AI Talks Chatbot - WordPress Integration Demo</h1>
+        
+        <div class="demo-controls">
+            <h3>🎮 Demo Vezérlők</h3>
+            
+            <div class="control-group">
+                <label for="position">Pozíció:</label>
+                <select id="position">
+                    <option value="bottom-right">Jobb alsó</option>
+                    <option value="bottom-left">Bal alsó</option>
+                    <option value="top-right">Jobb felső</option>
+                    <option value="top-left">Bal felső</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="color">Elsődleges szín:</label>
+                <input type="color" id="color" value="#2563eb">
+            </div>
+            
+            <div class="control-group">
+                <button onclick="initializeChatbot()">🚀 Chatbot Inicializálása</button>
+                <button onclick="destroyChatbot()" class="destroy">🗑️ Chatbot Eltávolítása</button>
+            </div>
+        </div>
+
+        <div class="integration-steps">
+            <h3>📋 WordPress Integráció Lépései</h3>
+            <ol>
+                <li>Töltsd le a <strong>ai-talks-chatbot-plugin.zip</strong> fájlt</li>
+                <li>Telepítsd a WordPress admin felületen: <em>Plugins → Add New → Upload Plugin</em></li>
+                <li>Aktiváld a plugint</li>
+                <li>Menj a <em>Settings → AI Talks Chatbot</em> menüpontba a konfiguráláshoz</li>
+                <li>Vagy használd a manuális integrációt a kód másolásával</li>
+            </ol>
+        </div>
+
+        <h3>💻 Manuális HTML/JavaScript Integráció</h3>
+        <p>Ha nem szeretnél plugint használni, egyszerűen add hozzá ezt a kódot a WordPress témád <code>footer.php</code> fájljához a <code>&lt;/body&gt;</code> tag elé:</p>
+
+        <div class="code-example">
+            <pre id="integration-code">&lt;!-- AI Talks Chatbot --&gt;
+&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ai-talks-chatbot@latest/dist/ai-talks-chatbot.css"&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/ai-talks-chatbot@latest/dist/ai-talks-chatbot.umd.js"&gt;&lt;/script&gt;
+
+&lt;script&gt;
+document.addEventListener('DOMContentLoaded', function() {
+    window.initAITalksChatbot({
+        position: 'bottom-right',
+        primaryColor: '#2563eb',
+        containerClass: 'wp-ai-talks-chatbot'
+    });
+});
+&lt;/script&gt;</pre>
+        </div>
+
+        <h3>⚙️ Fejlett Konfigurációs Opciók</h3>
+        <div class="code-example">
+            <pre>window.initAITalksChatbot({
+    // Pozíció beállítása
+    position: 'bottom-right', // 'bottom-left', 'top-right', 'top-left'
+    
+    // Színek testreszabása
+    primaryColor: '#2563eb', // Hexadecimális színkód
+    
+    // CSS osztály hozzáadása
+    containerClass: 'my-custom-chatbot-class',
+    
+    // Egyedi Supabase konfiguráció (opcionális)
+    supabaseUrl: 'https://your-project.supabase.co',
+    supabaseKey: 'your-anon-key'
+});</pre>
+        </div>
+
+        <h3>🎯 Funkcionalitás Vezérlése</h3>
+        <div class="code-example">
+            <pre>// Chatbot inicializálása
+window.AITalksChatbot.init({
+    position: 'bottom-left',
+    primaryColor: '#10b981'
+});
+
+// Chatbot eltávolítása
+window.AITalksChatbot.destroy();
+
+// Állapot ellenőrzése
+if (typeof window.AITalksChatbot !== 'undefined') {
+    console.log('Chatbot elérhető');
+}</pre>
+        </div>
+
+        <p style="text-align: center; margin-top: 40px; color: #666;">
+            <strong>AI Talks Konferencia</strong> • November 20, 2024 • Budapest<br>
+            <a href="https://aitalks.hu" target="_blank" style="color: #2563eb;">🎟️ Jegyvásárlás</a>
+        </p>
+    </div>
+
+    <!-- AI Talks Chatbot Integration -->
+    <link rel="stylesheet" href="../dist-widget/ai-talks-chatbot.css">
+    <script src="../dist-widget/ai-talks-chatbot.umd.js"></script>
+
+    <script>
+        function initializeChatbot() {
+            const position = document.getElementById('position').value;
+            const color = document.getElementById('color').value;
+            
+            if (typeof window.initAITalksChatbot === 'function') {
+                window.initAITalksChatbot({
+                    position: position,
+                    primaryColor: color,
+                    containerClass: 'demo-chatbot'
+                });
+                
+                // Update code example
+                updateCodeExample(position, color);
+                
+                alert('✅ Chatbot inicializálva! Nézd meg a jobb alsó sarokban.');
+            } else {
+                alert('❌ Chatbot script nem töltődött be. Ellenőrizd a fájl elérési utat.');
+            }
+        }
+        
+        function destroyChatbot() {
+            if (typeof window.AITalksChatbot !== 'undefined') {
+                window.AITalksChatbot.destroy();
+                alert('🗑️ Chatbot eltávolítva!');
+            } else {
+                alert('❌ Chatbot nem található.');
+            }
+        }
+        
+        function updateCodeExample(position, color) {
+            const codeElement = document.getElementById('integration-code');
+            codeElement.innerHTML = `&lt;!-- AI Talks Chatbot --&gt;
+&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ai-talks-chatbot@latest/dist/ai-talks-chatbot.css"&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/ai-talks-chatbot@latest/dist/ai-talks-chatbot.umd.js"&gt;&lt;/script&gt;
+
+&lt;script&gt;
+document.addEventListener('DOMContentLoaded', function() {
+    window.initAITalksChatbot({
+        position: '${position}',
+        primaryColor: '${color}',
+        containerClass: 'wp-ai-talks-chatbot'
+    });
+});
+&lt;/script&gt;`;
+        }
+        
+        // Auto-initialize with default settings
+        document.addEventListener('DOMContentLoaded', function() {
+            // Small delay to ensure scripts are loaded
+            setTimeout(initializeChatbot, 1000);
+        });
+    </script>
+</body>
+</html>
