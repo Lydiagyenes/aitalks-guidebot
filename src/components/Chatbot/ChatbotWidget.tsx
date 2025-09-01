@@ -17,7 +17,7 @@ export const ChatbotWidget = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Szia! Én vagyok az AI Talks asszisztensed! 🤖 November 20-án várunk a Bálna Budapestben, ahol a HVG & Amazing AI bemutatja, hogyan válhat az AI a te üzleti versenyelőnyeddé. Miben segíthetek? Jegyek, program, workshopok? 🚀',
+      text: 'Szia! Én vagyok az AI Talks asszisztensed! 🤖 2025. szeptember 3-án várunk Budapesten. Miben segíthetek? Jegyek, program, workshopok, parkolás, éttermek? 🚀',
       isBot: true,
       timestamp: new Date()
     }
@@ -96,41 +96,69 @@ export const ChatbotWidget = () => {
 
   const getFallbackResponse = (userInput: string): string => {
     const input = userInput.toLowerCase();
-    
+
+    // Program / időpont
     if (input.includes('program') || input.includes('menetrend') || input.includes('időpont') || input.includes('mikor')) {
-      return 'Az AI Talks 2025. november 20-án kerül megrendezésre, 11:00-22:00 között a Bálna Budapestben! Délelőtt inspiráló előadások, délután praktikus workshopok várnak. Három szinten választhatsz: Solo, Team vagy Enterprise magic. Szeretnéd megtudni a jegyáraink is? 💼';
+      return 'Az AI Talks 2025. szeptember 3-án lesz Budapesten. Délelőtt előadások, délután párhuzamos, gyakorlati workshopok. Kérsz ajánlást, melyik program lenne számodra a leghasznosabb? 💼';
     }
-    
+
+    // Előadók
     if (input.includes('előadó') || input.includes('speaker') || input.includes('ki beszél')) {
-      return 'Fantasztikus előadókat hívtunk meg! Például Tomas Snazyk (CEO, Startup Poland) és más AI szakértők, akik valós, működő megoldásokat mutatnak be. Nem elméletet, hanem azonnal alkalmazható tudást kapsz! Érdekelnek a jegy opciók? 🚀';
+      return 'Előadóink többek között: Lisa Kleinman (Make.com), Caio Moretti (grupoQ), Németh Gábor (Amazing AI), Balogh Csaba (HVG), W. Szabó Péter (Tengr.ai), Szauder Dávid (MOME). Kérsz részleteket valamelyik előadásról? 🎤';
     }
-    
+
+    // Jegyek / árak
     if (input.includes('jegy') || input.includes('ár') || input.includes('költség') || input.includes('mennyibe')) {
-      return 'Háromféle jegytípusunk van kedvezménnyel: BASIC 39.900 Ft+ÁFA (eredeti 49.900 Ft), PRÉMIUM 139.900 Ft+ÁFA (videófelvételekkel), VIP 169.900 Ft+ÁFA (VIP lounge, networking az előadókkal). A kedvezmény augusztus 31-ig él! Melyik érdekel? 🎟️';
+      return 'Jegyek: Early Bird 89.000 Ft, Standard 129.000 Ft, VIP 199.000 Ft (exkluzív networking). Melyik opció érdekel? 🎟️';
     }
-    
+
+    // Helyszín
     if (input.includes('helyszín') || input.includes('hol') || input.includes('cím') || input.includes('bálna')) {
-      return 'A konferencia a Bálna Budapestben lesz, a Fővám tér 11-12. szám alatt. Fantasztikus helyszín a Duna-parton, könnyen megközelíthető tömegközlekedéssel és autóval is! November 20-án, 11:00-22:00. Foglaljunk helyet neked? 📍';
+      return 'Helyszín: Budapest (pontosítás hamarosan). Ha a Bálna környéke felé jössz, szívesen adok étterem és parkolási tippeket is! 📍';
     }
-    
+
+    // Éttermek
+    if (input.includes('étterem') || input.includes('ebéd') || input.includes('vacsora')) {
+      return 'Ajánlott helyek a Bálna / Fővám tér környékén:\n• Esetleg Bisztró – modern európai, panoráma (árak/allergén nem jelölt).\n• Rombusz Étterem – elegáns, panoráma.\n• Petruska étkezde – házias magyar, napi ajánlat.\n• Fakanál Étterem – önkiszolgáló, 4000–6000 Ft, allergén kódok.\n• EscoBar & Cafe – magyar/nemzetközi + pizza. Foglaljak neked asztalt ajánlással? 🍽️';
+    }
+
+    // Parkolás
+    if (input.includes('parkol') || input.includes('parkoló') || input.includes('mélygarázs') || input.includes('utcai')) {
+      return 'Parkolás: Bálna mélygarázs 350 Ft/óra; Csarnok Parkoló (3–4 perc séta); Care Park Liliom (10–12 perc). Utcán: IX. ker. "A" zóna 600 Ft/óra, hétvégén ingyenes. Segítsek útvonalat tervezni? 🚗';
+    }
+
+    // Dress code
+    if (input.includes('dress') || input.includes('öltözet') || input.includes('ruha') || input.includes('viselet')) {
+      return 'Ajánlott viselet: business casual. Uraknak: ing/galléros póló, chino/sötét farmer, opció blézer, elegáns cipő vagy letisztult sneaker. Hölgyeknek: blúz/pulóver/top, szövetnadrág/szoknya/ruha, kiegészítő blézer/kardigán, kényelmes elegáns cipő. A lényeg a kényelem és a professzionális hatás. 👔👗';
+    }
+
+    // Allergének
+    if (input.includes('allergén') || input.includes('glutén') || input.includes('laktóz')) {
+      return 'Több környékbeli étterem online étlapján nincs részletes allergén-jelölés. Biztonság kedvéért javasolt előre rákérdezni telefonon/e-mailben. Szeretnél elérhetőséget egy választott helyhez? ⚠️';
+    }
+
+    // Networking
     if (input.includes('networking') || input.includes('kapcsolat') || input.includes('ismerkedés')) {
-      return 'Remek, hogy érdekel a networking! A VIP jeggyel zártkörű kapcsolatépítő találkozó az előadókkal és kiállítókkal, VIP lounge külön cateringgel. De minden jegytípusnál van lehetőség kapcsolatépítésre! Melyik jegytípus érdekel? 🤝';
+      return 'Networking: minden jeggyel van rá lehetőség, VIP-nél exkluzív lounge és külön programok. Szeretnél VIP infókat? 🤝';
     }
-    
+
+    // Miért éri meg?
     if (input.includes('miért') || input.includes('érdemes') || input.includes('előny') || input.includes('haszon')) {
-      return 'Az AI Talks egyedülálló! HVG & Amazing AI közös rendezvény, 70.000+ embernek már segítettek. Nem elméletet kapsz, hanem másnap már használható tudást. Valós esettanulmányok, működő workflow-k, AI-ügynökök építése. Ez befektetés a jövődbe! 💡';
+      return 'Nem elmélet, hanem azonnal alkalmazható tudás, valós magyar esettanulmányok és AI-ügynök/workflow megoldások – HVG & Amazing AI prémium minőségben. 💡';
     }
 
+    // Workshopok
     if (input.includes('workshop') || input.includes('műhely') || input.includes('gyakorlat')) {
-      return 'Délután három párhuzamos workshop-útvonal: Solo magic (egyéni hatékonyság), Team magic (csapat szintű AI), Enterprise magic (vállalatirányítási szint). A helyszínen választhatsz, melyik a legmegfelelőbb számodra! 🛠️';
+      return 'Délutáni workshopok: AI-csapatom (Amazing AI), Kódolt kreativitás (Béres), No-code automatizáció (Supercharge), Human 2.0 (NEXT), Vizuális anyagok AI-jal (Just Bee Digital), Copywriter 2.0 (Amazing AI), Voice AI (AI Squad). Melyik érdekel? 🛠️';
     }
 
+    // Szervezők
     if (input.includes('hvg') || input.includes('amazing') || input.includes('szervező')) {
-      return 'Az AI Talks a HVG (45+ éves médiatapasztalat) és az Amazing AI (70.000+ ember képzése) stratégiai szövetsége. Két hiteles szereplő garantálja a prémium minőséget és a gyakorlatias megközelítést! 🏆';
+      return 'Szervezők: HVG & Amazing AI – minőségi tartalom és gyakorlati megközelítés. 🏆';
     }
 
-    // Default sales-oriented response
-    return 'Köszönöm a kérdésed! Az AI Talks november 20-án vár a Bálna Budapestben - ez egy egyedülálló lehetőség, hogy az AI-t valódi versenyelőnnyé alakítsd. Van konkrét kérdésed a programról, jegyekről vagy workshopokról? Segítek megtalálni a számodra ideális opciót! ✨';
+    // Alapértelmezett, sales-orientált válasz
+    return 'Köszönöm a kérdésed! Az AI Talks 2025. szeptember 3-án indul Budapesten – korlátozott idejű kedvezményekkel. Melyik témáról küldjek részletes infót: jegyek, program, workshopok, parkolás vagy éttermek? ✨';
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
