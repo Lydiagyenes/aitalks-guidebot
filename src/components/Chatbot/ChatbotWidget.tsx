@@ -13,7 +13,7 @@ interface Message {
 }
 
 export const ChatbotWidget = () => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -259,6 +259,16 @@ export const ChatbotWidget = () => {
             </div>
           </div>
         </Card>
+      )}
+
+      {/* Toggle Button - only visible when closed */}
+      {!isOpen && (
+        <Button
+          onClick={() => setIsOpen(true)}
+          className="h-14 w-14 rounded-full shadow-chatbot transition-bounce bg-gradient-primary text-primary-foreground hover:shadow-glow"
+        >
+          <MessageCircle className="h-6 w-6" />
+        </Button>
       )}
 
     </div>
