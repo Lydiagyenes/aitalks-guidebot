@@ -45,10 +45,19 @@ AKTUÁLIS HELYZET:
 - A legnagyobb kedvezményekkel várják a résztvevőket
 - Korlátozott ideig tartó különleges árak
 
-JEGYTÍPUSOK (super early bird kedvezmények):
-- Early Bird jegy: 89.000 Ft (korlátozott ideig elérhető!)
-- Standard jegy: 129.000 Ft
-- VIP jegy: 199.000 Ft (exkluzív networking, külön programok)
+JEGYTÍPUSOK (super early bird kedvezmények, szeptember 30-ig érvényes):
+
+BASIC (AZ INDULÓ SZINT):
+- Ár: 59.900 Ft + áfa helyett 29.950 Ft + áfa
+- Tartalom: Teljes napos részvétel, délelőtti előadások és délutáni workshopok, kiállítók/interaktív standok, 30% HVG könyvek kupon, cégnévre is kérhető
+
+PRÉMIUM (A LEGNÉPSZERŰBB):
+- Ár: 69.900 Ft + áfa helyett 34.950 Ft + áfa
+- Tartalom: BASIC tartalom + videófelvételek az előadásokról és workshopokról, 14 napos ingyenes próbaidőszak az Amazing AI Tudástárhoz, Karen Hao: AI Birodalom című november 10-i budapesti könyvbemutatón való részvétel
+
+VIP (A KIEMELT KATEGÓRIA):
+- Ár: 119.900 Ft + áfa helyett 59.500 Ft + áfa
+- Tartalom: PRÉMIUM tartalom + soron kívüli VIP beléptetés, 3000 Ft értékű ebédkupon, Shownotes (digitális jegyzetcsomag), Karen Hao: AI Birodalom című könyve, Németh Gábor: A promptoláson túl című könyve, 30 napos ingyenes próbaidőszak az Amazing AI Tudástárhoz, 1 hónap hvg360 hozzáférés, HVG Klubkártya 2026
 
 EGYEDÜLÁLLÓ ÉRTÉKEK:
 - Nem elmélet, hanem másnap alkalmazható tudás
