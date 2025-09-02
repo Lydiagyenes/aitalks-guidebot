@@ -3,7 +3,6 @@ import { Calendar, MapPin, Users, Sparkles, ArrowRight, Star } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { UserMenu } from '@/components/UserMenu';
 
 export const AITalksLanding = () => {
   return (
@@ -14,7 +13,6 @@ export const AITalksLanding = () => {
           <Sparkles className="w-6 h-6 text-primary mr-2" />
           <span className="font-bold text-lg">AI Talks 2024</span>
         </div>
-        <UserMenu />
       </nav>
 
       {/* Hero Section */}
