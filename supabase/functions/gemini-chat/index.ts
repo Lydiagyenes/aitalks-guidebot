@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message } = await req.json();
+    const { message, history, topic_hint, last_followups } = await req.json();
     
     if (!message) {
       throw new Error('Message is required');
@@ -35,7 +35,7 @@ INFORMÁCIÓK A KONFERENCIÁRÓL:
 - Szervezők: HVG & Amazing AI
 - Téma: "Az AI mint üzlettárs: szemléletváltó konferencia az új korszak vezetőinek"
 - Státusz: A visszaszámlálás elkezdődött! Szeptember 3-án nyílik a jegyvásárlás
-- Fő üzenet: "Ne maradj le a startról!"
+- Fő üzenet: "Ne maradj le a startről!"
 
 AKTUÁLIS HELYZET:
 - Szeptember 3-án nyílik a jegyvásárlás - ez csak a jegyértékesítés kezdete!
@@ -80,7 +80,7 @@ KIEGÉSZÍTŐ TUDÁSBÁZIS (faktuális kérdésekhez válaszolj ezek alapján):
 - Utcai parkolás (IX. ker., "A" zóna): 600 Ft/óra, munkanap 8:00–22:00, jellemzően max. 3 óra; hétvégén/ünnepnapokon díjmentes. Rendezvények idején gyorsan telik: érdemes korán érkezni vagy közösségi közlekedést választani.
 
 3) Dress code (ajánlott: business casual)
-- Udvarias felvezetés: "Szeretnénk, ha a rendezvényen mindenki kényelmesen, mégis az esemény innovatív szellemiségéhez méltón érezné magát…"
+- Udvarias felvezetés: "Szeretnénk, ha a rendezvényen mindenki kényelmesen, mégis az esemény innovatív szellemiségéhez méltán érezné magát…"
 - Férfiak: ing (nyakkendő nem kötelező) / galléros póló / vékony pulóver; chino vagy sötétebb, nem szakadt farmer; opcionális blézer/kardigán; bőr/hasítottbőr cipő, loafer vagy letisztult sneaker.
 - Nők: blúz/ing/finomkötött pulóver/top; szövetnadrág/palazzo/szoknya/sötétebb farmer; csinos ruha (térd körüli); blézer/kardigán/ballonkabát; elegáns lapos cipő, mérsékelt sarok, bokacsizma vagy letisztult sneaker.
 
@@ -136,13 +136,21 @@ DÉLUTÁNI WORKSHOPOK (párhuzamosak):
 
     // VÁLASZADÁSI STÍLUS:
     // - Mindig tegezve szólítsd meg a felhasználót (következetes tegezés), udvarias, barátságos hangnemben. Kerüld a magázást és a többes szám 2. személyű formákat.
-    // - Legyen lelkes és professzionális, de ne legyen nyomulós. Kerüld a sürgető kifejezéseket (pl. „ne maradj le”).
+    // - Legyen lelkes és professzionális, de ne legyen nyomulós. Kerüld a sürgető kifejezéseket (pl. „ne maradj le").
     // - Adj 1-3 mondatos, lényegre törő válaszokat.
-    // - Tegyél fel 1-2 célzott pontosító kérdést, és adj felkínált opciókat (pl. „Tudok segíteni program, workshopok, parkolás, éttermek vagy jegyek témában – melyik érdekel?”).
     // - A jegyvásárlást csak kb. minden ötödik válaszban említsd meg röviden, vagy ha a felhasználó kifejezetten érdeklődik a jegyekről.
     // - Használj magyaros kifejezéseket és emojikat mértékkel.
     // - Ne használj linkeket (a chatbot az AI Talks weboldalán lesz beágyazva).
     // - Ha nem vagy biztos valamiben, kérj pontosítást és ajánlj általános segítséget.
+
+    // FOLLOW-UP STRATÉGIA - KRITIKUS:
+    // - MINDEN válasz végén pontosan 1 rövid, témára szabott követő kérdést tegyél fel
+    // - SOHA ne használd ezt: "Netán még másban is tudok segíteni, például a programmal, vagy a környékbeli éttermekkel kapcsolatban?"
+    // - A követő kérdések legyenek VÁLTOZATOSAK és KONTEXTUSRA SZABOTTAK
+    
+    // HISTORY CONTEXT: ${history ? `Utolsó üzenetek: ${JSON.stringify(history)}` : 'Nincs korábbi kontextus'}
+    // TOPIC HINT: ${topic_hint || 'általános'}
+    // USED FOLLOW-UPS: ${last_followups ? last_followups.join(', ') : 'nincs'}
 
 Válaszolj magyarul a következő kérdésre/üzenetre:`;
 
@@ -188,8 +196,19 @@ Válaszolj magyarul a következő kérdésre/üzenetre:`;
   } catch (error) {
     console.error('Error in gemini-chat function:', error);
     
-    // Fallback válasz ha a Gemini nem elérhető
-    const fallbackResponse = 'Köszi az üzeneted! Szívesen segítek: program, workshopok, parkolás, éttermek vagy jegyek témában – melyik érdekel? (A jegyvásárlás szeptember 3-án nyílik.) ✨';
+    // Fallback válasz témára szabottan
+    const topicFallbacks = {
+      program: 'Köszi az üzeneted! A konferencia november 20-án lesz Budapesten. Melyik előadás érdekel leginkább? ✨',
+      workshop: 'Köszi az üzenetet! Délután párhuzamos workshopok lesznek. Melyik témakör lenne számodra leginkább hasznos? 🛠️',
+      location: 'Helyszín: Bálna, Budapest, Fővám tér 11-12. Segítsek útvonalat tervezni? 📍',
+      parking: 'Parkolás: Bálna mélygarázs 350 Ft/óra vagy utcai. Segítsek dönteni a parkolási opcióban? 🚗',
+      restaurant: 'Sok jó étterem van a környéken! Foglaljak asztalt valahol? 🍽️',
+      ticket: 'Super Early Bird árak szeptember 30-ig! Melyik jegytípus lenne ideális számodra? 🎟️',
+      speaker: 'Kiváló előadóink lesznek! Kérsz részleteket valamelyik előadásról? 🎤',
+      general: 'Köszi az üzeneted! Miben tudok még segíteni? ✨'
+    };
+    
+    const fallbackResponse = topicFallbacks[topic_hint as keyof typeof topicFallbacks] || topicFallbacks.general;
     
     return new Response(JSON.stringify({ response: fallbackResponse }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

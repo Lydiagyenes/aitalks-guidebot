@@ -19,13 +19,15 @@ export const ChatbotWidget = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Szia! Én vagyok az AI Talks asszisztensed! 🤖 Jegyvásárlás szeptember 3-án nyílik, konferencia november 20-án lesz Budapesten. Miben segíthetek? Jegyek, program, workshopok, parkolás, éttermek? 🚀',
+      text: 'Szia! Én vagyok az AI Talks asszisztensed! 🤖 Szívesen segítek a konferenciával kapcsolatos kérdésekben. Miben segíthetek?',
       isBot: true,
       timestamp: new Date()
     }
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [followupHistory, setFollowupHistory] = useState<string[]>([]);
+  const [ticketMentionCounter, setTicketMentionCounter] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -101,91 +103,165 @@ export const ChatbotWidget = () => {
     }
   };
 
+  const detectTopic = (userInput: string): string => {
+    const input = userInput.toLowerCase();
+    if (input.includes('program') || input.includes('menetrend') || input.includes('időpont') || input.includes('mikor')) return 'program';
+    if (input.includes('workshop') || input.includes('műhely') || input.includes('gyakorlat')) return 'workshop';
+    if (input.includes('helyszín') || input.includes('hol') || input.includes('cím') || input.includes('bálna')) return 'location';
+    if (input.includes('parkol') || input.includes('parkoló') || input.includes('mélygarázs')) return 'parking';
+    if (input.includes('étterem') || input.includes('ebéd') || input.includes('vacsora')) return 'restaurant';
+    if (input.includes('jegy') || input.includes('ár') || input.includes('költség') || input.includes('mennyibe')) return 'ticket';
+    if (input.includes('előadó') || input.includes('speaker') || input.includes('ki beszél')) return 'speaker';
+    if (input.includes('dress') || input.includes('öltözet') || input.includes('ruha')) return 'dress';
+    if (input.includes('networking') || input.includes('kapcsolat') || input.includes('ismerkedés')) return 'networking';
+    return 'general';
+  };
+
+  const getFollowUpQuestion = (topic: string, usedFollowups: string[]): string => {
+    const followups = {
+      program: ["Melyik előadás érdekel leginkább?", "Kérsz részletet valamelyik workshopról?", "Segítsek időbeosztást tervezni?"],
+      workshop: ["Melyik témakör lenne számodra leginkább hasznos?", "Kérdések vannak a gyakorlati részekkel kapcsolatban?", "Érdekel más workshop is?"],
+      location: ["Segítsek útvonalat tervezni?", "Kell parkolási tipp is?", "Érdeklődnél közlekedési infó iránt?"],
+      parking: ["Segítsek dönteni a parkolási opcióban?", "Kérsz útvonal-tippet is?", "Érdekel a közösségi közlekedés is?"],
+      restaurant: ["Foglaljak asztalt valahol?", "Kell allergén információ?", "Érdekel még más környékbeli hely?"],
+      ticket: ["Melyik jegytípus lenne ideális számodra?", "Kérsz részleteket a VIP előnyökről?", "Segítsek céges elszámolásban?"],
+      speaker: ["Kérsz részleteket valamelyik előadásról?", "Érdekel valamelyik előadó háttere?", "Melyik témakör vonzó?"],
+      dress: ["Kell konkrét öltözködési tipp?", "Vannak kérdések a business casual-lel kapcsolatban?", "Segítsek outfit ötletekkel?"],
+      networking: ["Érdekel a VIP networking?", "Kérsz tippeket az ismerkedéshez?", "Segítsek stratégiát tervezni?"],
+      general: ["Miben tudok még segíteni?", "Van más kérdés?", "Érdekel valami konkrét téma?"]
+    };
+
+    const options = followups[topic as keyof typeof followups] || followups.general;
+    const available = options.filter(option => !usedFollowups.includes(option));
+    return available.length > 0 ? available[Math.floor(Math.random() * available.length)] : options[0];
+  };
+
   const getAIResponse = async (userInput: string): Promise<string> => {
     try {
       const { supabase } = await import('@/integrations/supabase/client');
+      const topic = detectTopic(userInput);
+      const history = messages.slice(-3).map(m => ({ text: m.text, isBot: m.isBot }));
       
       const { data, error } = await supabase.functions.invoke('gemini-chat', {
-        body: { message: userInput }
+        body: { 
+          message: userInput,
+          history,
+          topic_hint: topic,
+          last_followups: followupHistory.slice(-5)
+        }
       });
 
       if (error) {
         console.error('Supabase function error:', error);
-        return getFallbackResponse(userInput);
+        return getFallbackResponse(userInput, topic);
       }
 
-      return data?.response || getFallbackResponse(userInput);
+      return data?.response || getFallbackResponse(userInput, topic);
     } catch (error) {
       console.error('Error calling Gemini:', error);
-      return getFallbackResponse(userInput);
+      return getFallbackResponse(userInput, detectTopic(userInput));
     }
   };
 
-  const getFallbackResponse = (userInput: string): string => {
+  const getFallbackResponse = (userInput: string, topic: string): string => {
     const input = userInput.toLowerCase();
+    
+    // Update ticket mention counter
+    setTicketMentionCounter(prev => prev + 1);
+    const shouldMentionTickets = ticketMentionCounter % 5 === 0;
 
     // Program / időpont
     if (input.includes('program') || input.includes('menetrend') || input.includes('időpont') || input.includes('mikor')) {
-      return 'Az AI Talks jegyvásárlása szeptember 3-án nyílik, a konferencia november 20-án lesz Budapesten. Délelőtt előadások, délután párhuzamos, gyakorlati workshopok. Kérsz ajánlást, melyik program lenne számodra a leghasznosabb? 💼';
+      const responses = [
+        'A konferencia november 20-án lesz Budapesten. Délelőtt előadások, délután workshopok. Melyik előadás érdekel leginkább?',
+        'Program: délelőtt 9:05-tól előadások, délután 13:15-től workshopok. Kérsz részletet valamelyik workshopról?',
+        'Teljes napos program november 20-án a Bálnában. Segítsek időbeosztást tervezni?'
+      ];
+      return responses[Math.floor(Math.random() * responses.length)] + (shouldMentionTickets ? ' (Super Early Bird árak szeptember 30-ig!)' : '');
     }
 
     // Előadók
     if (input.includes('előadó') || input.includes('speaker') || input.includes('ki beszél')) {
-      return 'Előadóink többek között: Lisa Kleinman (Make.com), Caio Moretti (grupoQ), Németh Gábor (Amazing AI), Balogh Csaba (HVG), W. Szabó Péter (Tengr.ai), Szauder Dávid (MOME). Kérsz részleteket valamelyik előadásról? 🎤';
+      const responses = [
+        'Előadóink: Lisa Kleinman (Make.com), Caio Moretti (grupoQ), Németh Gábor (Amazing AI), Balogh Csaba (HVG) és mások. Kérsz részleteket valamelyik előadásról?',
+        'Nemzetközi és hazai AI-szakértők beszélnek. Érdekel valamelyik előadó háttere?',
+        'Kiváló speaker lineup: AI-ügynöktől művészetig. Melyik témakör vonzó?'
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
     }
 
-    // Jegyek / árak
+    // Jegyek / árak - frissített Super Early Bird árak
     if (input.includes('jegy') || input.includes('ár') || input.includes('költség') || input.includes('mennyibe')) {
-      return 'Jegyek: Early Bird 89.000 Ft, Standard 129.000 Ft, VIP 199.000 Ft (exkluzív networking). Melyik opció érdekel? 🎟️';
+      return 'Super Early Bird árak szeptember 30-ig: BASIC 29.950 Ft+áfa, PRÉMIUM 34.950 Ft+áfa, VIP 59.500 Ft+áfa. Melyik jegytípus lenne ideális számodra? 🎟️';
     }
 
     // Helyszín
     if (input.includes('helyszín') || input.includes('hol') || input.includes('cím') || input.includes('bálna')) {
-      return 'Helyszín: Budapest (pontosítás hamarosan). Ha a Bálna környéke felé jössz, szívesen adok étterem és parkolási tippeket is! 📍';
+      const responses = [
+        'Helyszín: Bálna, Budapest, Fővám tér 11-12, 1093. Segítsek útvonalat tervezni?',
+        'A Bálna épületében leszünk, Fővám téren. Kell parkolási tipp is?',
+        'Központi helyszín a Duna-parton. Érdeklődnél közlekedési infó iránt?'
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
     }
 
     // Éttermek
     if (input.includes('étterem') || input.includes('ebéd') || input.includes('vacsora')) {
-      return 'Ajánlott helyek a Bálna / Fővám tér környékén:\n• Esetleg Bisztró – modern európai, panoráma (árak/allergén nem jelölt).\n• Rombusz Étterem – elegáns, panoráma.\n• Petruska étkezde – házias magyar, napi ajánlat.\n• Fakanál Étterem – önkiszolgáló, 4000–6000 Ft, allergén kódok.\n• EscoBar & Cafe – magyar/nemzetközi + pizza. Foglaljak neked asztalt ajánlással? 🍽️';
+      const responses = [
+        'Top helyek: Esetleg Bisztró (panoráma), Fakanál (4000-6000 Ft), EscoBar & Cafe (pizza is). Foglaljak asztalt valahol?',
+        'Közelben: Rombusz Étterem (elegáns), Petruska étkezde (házias magyar). Kell allergén információ?',
+        'Válogatás: modern európai, magyar házias, önkiszolgáló opciók. Érdekel még más környékbeli hely?'
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
     }
 
     // Parkolás
     if (input.includes('parkol') || input.includes('parkoló') || input.includes('mélygarázs') || input.includes('utcai')) {
-      return 'Parkolás: Bálna mélygarázs 350 Ft/óra; Csarnok Parkoló (3–4 perc séta); Care Park Liliom (10–12 perc). Utcán: IX. ker. "A" zóna 600 Ft/óra, hétvégén ingyenes. Segítsek útvonalat tervezni? 🚗';
+      const responses = [
+        'Bálna mélygarázs 350 Ft/óra (legközelebb), vagy környékbeli parkolók. Segítsek dönteni a parkolási opcióban?',
+        'Több opció: mélygarázs, Csarnok Parkoló, utcai zónás. Kérsz útvonal-tippet is?',
+        'Parkolás IX. kerületi A zóna (600 Ft/óra) vagy fedett garázsok. Érdekel a közösségi közlekedés is?'
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
     }
 
     // Dress code
     if (input.includes('dress') || input.includes('öltözet') || input.includes('ruha') || input.includes('viselet')) {
-      return 'Ajánlott viselet: business casual. Uraknak: ing/galléros póló, chino/sötét farmer, opció blézer, elegáns cipő vagy letisztult sneaker. Hölgyeknek: blúz/pulóver/top, szövetnadrág/szoknya/ruha, kiegészítő blézer/kardigán, kényelmes elegáns cipő. A lényeg a kényelem és a professzionális hatás. 👔👗';
-    }
-
-    // Allergének
-    if (input.includes('allergén') || input.includes('glutén') || input.includes('laktóz')) {
-      return 'Több környékbeli étterem online étlapján nincs részletes allergén-jelölés. Biztonság kedvéért javasolt előre rákérdezni telefonon/e-mailben. Szeretnél elérhetőséget egy választott helyhez? ⚠️';
-    }
-
-    // Networking
-    if (input.includes('networking') || input.includes('kapcsolat') || input.includes('ismerkedés')) {
-      return 'Networking: minden jeggyel van rá lehetőség, VIP-nél exkluzív lounge és külön programok. Szeretnél VIP infókat? 🤝';
-    }
-
-    // Miért éri meg?
-    if (input.includes('miért') || input.includes('érdemes') || input.includes('előny') || input.includes('haszon')) {
-      return 'Nem elmélet, hanem azonnal alkalmazható tudás, valós magyar esettanulmányok és AI-ügynök/workflow megoldások – HVG & Amazing AI prémium minőségben. 💡';
+      const responses = [
+        'Business casual ajánlott - kényelmes, mégis professzionális. Kell konkrét öltözködési tipp?',
+        'Ing/blúz + chino/szövetnadrág, opcionális blézer. Vannak kérdések a business casual-lel kapcsolatban?',
+        'Laza eleganciára törekedj - kényelmes, de szép. Segítsek outfit ötletekkel?'
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
     }
 
     // Workshopok
     if (input.includes('workshop') || input.includes('műhely') || input.includes('gyakorlat')) {
-      return 'Délutáni workshopok: AI-csapatom (Amazing AI), Kódolt kreativitás (Béres), No-code automatizáció (Supercharge), Human 2.0 (NEXT), Vizuális anyagok AI-jal (Just Bee Digital), Copywriter 2.0 (Amazing AI), Voice AI (AI Squad). Melyik érdekel? 🛠️';
+      const responses = [
+        'Délutáni workshopok: AI-csapatom, No-code automatizáció, Voice AI, Copywriter 2.0 stb. Melyik témakör lenne számodra leginkább hasznos?',
+        'Gyakorlati foglalkozások 13:15-től: kreativitás, hatékonyság, marketing, automatizáció. Kérdések vannak a gyakorlati részekkel kapcsolatban?',
+        '8 párhuzamos workshop délután - mindegyik hands-on. Érdekel más workshop is?'
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
     }
 
-    // Szervezők
-    if (input.includes('hvg') || input.includes('amazing') || input.includes('szervező')) {
-      return 'Szervezők: HVG & Amazing AI – minőségi tartalom és gyakorlati megközelítés. 🏆';
+    // Networking
+    if (input.includes('networking') || input.includes('kapcsolat') || input.includes('ismerkedés')) {
+      const responses = [
+        'Networking minden jegytípusban, VIP-nél exkluzív lounge. Érdekel a VIP networking?',
+        'Remek lehetőség kapcsolatépítésre! Kérsz tippeket az ismerkedéshez?',
+        'Szünetek és VIP area ideális networking-re. Segítsek stratégiát tervezni?'
+      ];
+      return responses[Math.floor(Math.random() * responses.length)];
     }
 
-    // Alapértelmezett, semleges válasz
-    return 'Köszi a kérdésed! Szívesen segítek: program, workshopok, parkolás, éttermek vagy jegyek – melyik érdekel? ✨';
+    // Alapértelmezett, változatos válaszok
+    const generalResponses = [
+      'Szívesen segítek további kérdésekkel! Miben tudok még segíteni?',
+      'Köszi a kérdést! Van más kérdés?',
+      'További infó kell? Érdekel valami konkrét téma?'
+    ];
+    return generalResponses[Math.floor(Math.random() * generalResponses.length)] + (shouldMentionTickets ? ' (Jegyvásárlás szeptember 3-án nyílik!)' : '');
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
