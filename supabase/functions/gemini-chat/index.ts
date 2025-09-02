@@ -45,7 +45,7 @@ AKTUÁLIS HELYZET:
 - A legnagyobb kedvezményekkel várják a résztvevőket
 - Korlátozott ideig tartó különleges árak
 
-JEGYTÍPUSOK (korai madár kedvezmények):
+JEGYTÍPUSOK (super early bird kedvezmények):
 - Early Bird jegy: 89.000 Ft (korlátozott ideig elérhető!)
 - Standard jegy: 129.000 Ft
 - VIP jegy: 199.000 Ft (exkluzív networking, külön programok)
