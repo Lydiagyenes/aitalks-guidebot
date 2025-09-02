@@ -14,13 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      documents: {
+        Row: {
+          created_at: string
+          expires_at: string
+          file_size: number
+          filename: string
+          id: string
+          mime_type: string
+          original_filename: string
+          processing_details: Json | null
+          storage_path: string
+          updated_at: string
+          uploaded_at: string
+          user_id: string | null
+          validation_errors: string[] | null
+          validation_result: Json | null
+          validation_status: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          file_size: number
+          filename: string
+          id?: string
+          mime_type: string
+          original_filename: string
+          processing_details?: Json | null
+          storage_path: string
+          updated_at?: string
+          uploaded_at?: string
+          user_id?: string | null
+          validation_errors?: string[] | null
+          validation_result?: Json | null
+          validation_status?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          file_size?: number
+          filename?: string
+          id?: string
+          mime_type?: string
+          original_filename?: string
+          processing_details?: Json | null
+          storage_path?: string
+          updated_at?: string
+          uploaded_at?: string
+          user_id?: string | null
+          validation_errors?: string[] | null
+          validation_result?: Json | null
+          validation_status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_expired_documents: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
