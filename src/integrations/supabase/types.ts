@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      chatbot_interactions: {
+        Row: {
+          answer: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          page_url: string | null
+          question: string
+          referrer: string | null
+          session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          page_url?: string | null
+          question: string
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          page_url?: string | null
+          question?: string
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       documents: {
         Row: {
           created_at: string

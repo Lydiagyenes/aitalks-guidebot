@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { createClient } from '@supabase/supabase-js';
 
 interface Message {
   id: string;
@@ -21,6 +22,8 @@ export const StandaloneChatbotWidget: React.FC<ChatbotConfig> = ({
   supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1Z3hudmtqeXpnZXBrenpxandsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3ODA1NTAsImV4cCI6MjA3MTM1NjU1MH0.Ci1uga23LGBEkVIJftwk3FxFASba9oiCqE5LiPxlfIU"
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [sessionId] = useState(() => `standalone_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  const supabaseClient = createClient(supabaseUrl, supabaseKey);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -65,6 +68,9 @@ export const StandaloneChatbotWidget: React.FC<ChatbotConfig> = ({
           timestamp: new Date()
         };
         setMessages(prev => [...prev, botMessage]);
+        
+        // Log the interaction
+        await logInteraction(inputValue, responseText);
       } catch (error) {
         console.error('Error getting AI response:', error);
         const errorMessage: Message = {
@@ -74,10 +80,32 @@ export const StandaloneChatbotWidget: React.FC<ChatbotConfig> = ({
           timestamp: new Date()
         };
         setMessages(prev => [...prev, errorMessage]);
+        
+        // Log the error interaction
+        await logInteraction(inputValue, errorMessage.text);
       } finally {
         setIsTyping(false);
       }
     }, 1500);
+  };
+
+  const logInteraction = async (question: string, answer: string) => {
+    try {
+      await supabaseClient.from('chatbot_interactions').insert({
+        session_id: sessionId,
+        question,
+        answer,
+        page_url: typeof window !== 'undefined' ? window.location.href : '',
+        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        referrer: typeof document !== 'undefined' ? (document.referrer || null) : null,
+        metadata: {
+          component: 'StandaloneChatbotWidget',
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      console.error('Failed to log interaction:', error);
+    }
   };
 
   const getAIResponse = async (userInput: string): Promise<string> => {

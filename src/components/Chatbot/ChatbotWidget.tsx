@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   id: string;
@@ -14,6 +15,7 @@ interface Message {
 
 export const ChatbotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -59,6 +61,9 @@ export const ChatbotWidget = () => {
           timestamp: new Date()
         };
         setMessages(prev => [...prev, botMessage]);
+        
+        // Log the interaction
+        await logInteraction(inputValue, responseText);
       } catch (error) {
         console.error('Error getting AI response:', error);
         const errorMessage: Message = {
@@ -68,10 +73,32 @@ export const ChatbotWidget = () => {
           timestamp: new Date()
         };
         setMessages(prev => [...prev, errorMessage]);
+        
+        // Log the error interaction
+        await logInteraction(inputValue, errorMessage.text);
       } finally {
         setIsTyping(false);
       }
     }, 1500);
+  };
+
+  const logInteraction = async (question: string, answer: string) => {
+    try {
+      await supabase.from('chatbot_interactions').insert({
+        session_id: sessionId,
+        question,
+        answer,
+        page_url: window.location.href,
+        user_agent: navigator.userAgent,
+        referrer: document.referrer || null,
+        metadata: {
+          component: 'ChatbotWidget',
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      console.error('Failed to log interaction:', error);
+    }
   };
 
   const getAIResponse = async (userInput: string): Promise<string> => {
