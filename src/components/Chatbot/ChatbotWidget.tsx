@@ -184,8 +184,8 @@ export const ChatbotWidget = () => {
       return 'Szervezők: HVG & Amazing AI – minőségi tartalom és gyakorlati megközelítés. 🏆';
     }
 
-    // Alapértelmezett, sales-orientált válasz
-    return 'Köszönöm a kérdésed! Az AI Talks jegyvásárlása szeptember 3-án nyílik, a konferencia november 20-án lesz Budapesten – korlátozott idejű kedvezményekkel. Melyik témáról küldjek részletes infót: jegyek, program, workshopok, parkolás vagy éttermek? ✨';
+    // Alapértelmezett, semleges válasz
+    return 'Köszi a kérdésed! Szívesen segítek: program, workshopok, parkolás, éttermek vagy jegyek – melyik érdekel? ✨';
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
