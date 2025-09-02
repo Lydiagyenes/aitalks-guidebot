@@ -3,10 +3,20 @@ import { Calendar, MapPin, Users, Sparkles, ArrowRight, Star } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { UserMenu } from '@/components/UserMenu';
 
 export const AITalksLanding = () => {
   return (
     <div className="min-h-screen bg-gradient-subtle">
+      {/* Navigation */}
+      <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
+        <div className="flex items-center">
+          <Sparkles className="w-6 h-6 text-primary mr-2" />
+          <span className="font-bold text-lg">AI Talks 2024</span>
+        </div>
+        <UserMenu />
+      </nav>
+
       {/* Hero Section */}
       <section className="container mx-auto px-6 py-20 text-center">
         <div className="max-w-4xl mx-auto">
