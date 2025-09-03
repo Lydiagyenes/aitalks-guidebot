@@ -7,8 +7,10 @@ async function buildWidget() {
   console.log('🚀 Building AI Talks Chatbot widget...');
   
   try {
+    // Build with explicit widget config
     await build({
       configFile: path.resolve(__dirname, 'vite.widget.config.ts'),
+      mode: 'production'
     });
     
     console.log('✅ Widget build completed successfully!');
