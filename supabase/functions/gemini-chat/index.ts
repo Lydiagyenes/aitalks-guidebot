@@ -93,6 +93,16 @@ KIEGÉSZÍTŐ TUDÁSBÁZIS (faktuális kérdésekhez válaszolj ezek alapján):
 - Szauder Dávid (Médiaművész, MOME): AI-művészet – saját modellek, folyamat és jogi kérdések.
 - Kerekasztal (moderátor: Koltai Balázs) résztvevők többek között: Laczkó Gábor (Stylers Group), Deliága Ákos (Talk-a-bot).
 
+5) ELŐADÓI PROFILOK – RÉSZLETES (ezt a blokkot csak akkor használd, ha a felhasználó konkrét előadóra kérdez rá; elsőre 1-3 mondatos összegzést adj, és csak kérésre bontsd ki részletesen)
+- Lisa Kleinman (Make.com): HCI szakértő, a Make.com terméktervezési vezetője, az AI-ügynökök és no-code workflow-k emberközpontú tervezésének specialistája. Előadás: "Ügynökök köztünk – Megbízható no-code munkafolyamatok tervezése" (átlátható, kontrollálható AI-ügynökök valós példákkal). Részletesen: texas-i HCI PhD, korábban Intel/Nokia/LogMeIn (GoTo), tervei a "calm tech" (nyugalomra tervezés) irányát követik.
+- Caio Moretti (grupoQ / Qconcursos): AI-vezérelt edtech skálázás szakértője; csapata 48 óra alatt 3M$ bevételt ért el egy AI-alkalmazással. Előadás: "Vibe-coding a való világban" (termékfejlesztés radikális gyorsítása AI-val). Részletesen: a São Pauló-i Egyetem oktatója, informatikai PhD, 35M+ felhasználós platform vezetője.
+- Németh Gábor (Amazing AI): 15+ év nagyvállalati tapasztalat, AI-stratégia és automatizáció; "AI Fluency" szemlélet a promptoláson túl. Részletesen: az Amazing AI társalapítója, vállalati képzések és futó AI-projektek szakmai vezetője, Stylers Group partner.
+- Balogh Csaba (HVG): a Tech+Tudomány rovat vezető szerkesztője, egyetemi oktató. Előadás: az év legfontosabb AI-áttörései és a 2026-os trendek. Részletesen: hiteles, elemző megközelítés, akadémiai és újságírói háttérrel.
+- W. Szabó Péter (Tengr.ai): felhasználóközpontú ML-kutató, a Tengr.ai alapítója, "hive-mind" ágens-architektúra. Előadás: "Az AI nem veszi el a munkát? De igen! Az autonóm ügynökök kora" – a munka jövője ügynökökkel.
+- Szauder Dávid (MOME): nemzetközi médiaművész, AI-t mint alkotótárs használja; saját trénelt modellek, látványos workflow-k. Előadás: "AI-művészet" – technológia, kreatív folyamat, jogi kérdések.
+- Kerekasztal résztvevők: Moderátor – Koltai Balázs (Genezit): digitális transzformációs szakértő, 25 év tapasztalat. Résztvevők: Laczkó Gábor (Stylers Group – AI stratégia, vállalati implementációk), Deliága Ákos (Talk-a-bot – AI-alapú kommunikáció, 100k+ dolgozó kapcsolása AI-val).
+- Workshop előadók (röviden): Lukács Bence (Supercharge – no-code automatizáció: Zapier/Make/n8n), Tóth-Czere Péter (NEXT – fenntartható hatékonyság, "second brain"), Pásti Edina (Just Bee Digital – vizuális anyagok AI-val), Csonka Zsolt (Amazing AI – Copywriter 2.0, AI-karmesteri szemlélet), Laczkó Gábor & Tiszavölgyi Péter (Stylers – AI stratégia 5 lépésben), Sabján László & Kertvéllesy András (AI Squad – Voice AI ügyfélszolgálatban).
+
 5) Workshopok – délutáni, párhuzamos
 - Németh Gábor: Én és az AI-csapatom.
 - Drobny-Burján Andrea (Béres): Kódolt kreativitás – B.I.R.D.S. 5+1 lépés.
