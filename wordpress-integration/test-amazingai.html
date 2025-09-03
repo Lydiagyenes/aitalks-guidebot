@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Talks Chatbot Teszt - Amazing AI</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2563eb;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+        .test-status {
+            background: #f0f9ff;
+            border: 2px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .test-status h3 {
+            color: #0369a1;
+            margin-top: 0;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-loading {
+            background: #f59e0b;
+            animation: pulse 1s infinite;
+        }
+        .status-success {
+            background: #10b981;
+        }
+        .status-error {
+            background: #ef4444;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .debug-info {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        .debug-info pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #1d4ed8;
+        }
+        .btn-danger {
+            background: #dc2626;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        .btn-success {
+            background: #059669;
+        }
+        .btn-success:hover {
+            background: #047857;
+        }
+        .config-panel {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .config-group {
+            margin-bottom: 15px;
+        }
+        .config-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #374151;
+        }
+        .config-group select,
+        .config-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .info-box {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .info-box h4 {
+            color: #065f46;
+            margin-top: 0;
+        }
+        .info-box p {
+            color: #047857;
+            margin: 10px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 AI Talks Chatbot</h1>
+        <div class="subtitle">Teszt a tudastar.amazingai.hu oldalhoz</div>
+        
+        <div class="test-status">
+            <h3>Betöltési Állapot</h3>
+            <div id="css-status">
+                <span class="status-indicator status-loading"></span>
+                CSS fájl betöltése...
+            </div>
+            <div id="js-status">
+                <span class="status-indicator status-loading"></span>
+                JavaScript fájl betöltése...
+            </div>
+            <div id="init-status">
+                <span class="status-indicator status-loading"></span>
+                Chatbot inicializálás...
+            </div>
+        </div>
+
+        <div class="config-panel">
+            <h4>⚙️ Chatbot Konfiguráció</h4>
+            <div class="config-group">
+                <label for="position">Pozíció:</label>
+                <select id="position">
+                    <option value="bottom-right">Jobb alsó</option>
+                    <option value="bottom-left">Bal alsó</option>
+                    <option value="top-right">Jobb felső</option>
+                    <option value="top-left">Bal felső</option>
+                </select>
+            </div>
+            <div class="config-group">
+                <label for="color">Elsődleges szín:</label>
+                <input type="color" id="color" value="#2563eb">
+            </div>
+            <div class="controls">
+                <button class="btn" onclick="initializeChatbot()">🚀 Inicializálás</button>
+                <button class="btn btn-danger" onclick="destroyChatbot()">🗑️ Eltávolítás</button>
+                <button class="btn btn-success" onclick="testChatbot()">✅ Teszt</button>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h4>📋 WordPress Integráció</h4>
+            <p><strong>CDN URL-ek a https://github.com/Lydiagyenes/aitalks-guidebot.git repo alapján:</strong></p>
+            <p>CSS: <code>https://cdn.jsdelivr.net/gh/Lydiagyenes/aitalks-guidebot@main/dist-widget/ai-talks-chatbot.css</code></p>
+            <p>JS: <code>https://cdn.jsdelivr.net/gh/Lydiagyenes/aitalks-guidebot@main/dist-widget/ai-talks-chatbot.umd.js</code></p>
+        </div>
+
+        <div class="debug-info">
+            <strong>🔍 Debug Konzol:</strong>
+            <pre id="debug-console">Betöltés...</pre>
+        </div>
+
+        <div class="footer">
+            <strong>AI Talks Konferencia</strong> • November 20, 2024 • Budapest<br>
+            <a href="https://aitalks.hu" target="_blank" style="color: #2563eb; text-decoration: none;">🎟️ Jegyvásárlás</a>
+        </div>
+    </div>
+
+    <!-- AI Talks Chatbot Integration -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Lydiagyenes/aitalks-guidebot@main/dist-widget/ai-talks-chatbot.css" 
+          onload="updateStatus('css-status', 'success', 'CSS fájl sikeresen betöltve')" 
+          onerror="updateStatus('css-status', 'error', 'CSS fájl betöltési hiba')">
+    
+    <script src="https://cdn.jsdelivr.net/gh/Lydiagyenes/aitalks-guidebot@main/dist-widget/ai-talks-chatbot.umd.js" 
+            onload="updateStatus('js-status', 'success', 'JavaScript fájl sikeresen betöltve')" 
+            onerror="updateStatus('js-status', 'error', 'JavaScript fájl betöltési hiba')"></script>
+
+    <script>
+        let debugMessages = [];
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            debugMessages.push(`[${timestamp}] ${message}`);
+            document.getElementById('debug-console').textContent = debugMessages.join('\n');
+        }
+
+        function updateStatus(elementId, status, message) {
+            const element = document.getElementById(elementId);
+            const indicator = element.querySelector('.status-indicator');
+            
+            indicator.className = `status-indicator status-${status}`;
+            element.innerHTML = `<span class="status-indicator status-${status}"></span>${message}`;
+            
+            log(message);
+        }
+
+        function initializeChatbot() {
+            log('Chatbot inicializálás kísérlet...');
+            
+            const position = document.getElementById('position').value;
+            const color = document.getElementById('color').value;
+            
+            if (typeof window.initAITalksChatbot === 'function') {
+                try {
+                    window.initAITalksChatbot({
+                        position: position,
+                        primaryColor: color,
+                        containerClass: 'amazingai-test-chatbot'
+                    });
+                    
+                    updateStatus('init-status', 'success', 'Chatbot sikeresen inicializálva');
+                    log(`Chatbot inicializálva - Pozíció: ${position}, Szín: ${color}`);
+                    
+                } catch (error) {
+                    updateStatus('init-status', 'error', 'Chatbot inicializálási hiba');
+                    log(`Hiba az inicializálás során: ${error.message}`);
+                }
+            } else {
+                updateStatus('init-status', 'error', 'initAITalksChatbot függvény nem található');
+                log('HIBA: initAITalksChatbot függvény nem elérhető');
+                log('Elérhető globális függvények: ' + Object.keys(window).filter(k => k.includes('AI')).join(', '));
+            }
+        }
+
+        function destroyChatbot() {
+            log('Chatbot eltávolítás kísérlet...');
+            
+            if (typeof window.AITalksChatbot !== 'undefined' && window.AITalksChatbot.destroy) {
+                window.AITalksChatbot.destroy();
+                updateStatus('init-status', 'loading', 'Chatbot eltávolítva');
+                log('Chatbot sikeresen eltávolítva');
+            } else {
+                log('HIBA: AITalksChatbot.destroy függvény nem elérhető');
+            }
+        }
+
+        function testChatbot() {
+            log('Chatbot funkcionalitás teszt...');
+            
+            // Ellenőrizzük a DOM-ban a chatbot jelenlétét
+            const chatbotContainer = document.getElementById('ai-talks-chatbot-container');
+            if (chatbotContainer) {
+                log('✅ Chatbot container megtalálva a DOM-ban');
+            } else {
+                log('❌ Chatbot container nem található a DOM-ban');
+            }
+            
+            // Ellenőrizzük a globális függvényeket
+            const hasInit = typeof window.initAITalksChatbot === 'function';
+            const hasDestroy = typeof window.AITalksChatbot !== 'undefined';
+            
+            log(`Függvények elérhetősége: init=${hasInit}, destroy=${hasDestroy}`);
+            
+            // Network hibák ellenőrzése
+            log('Konzol hibák ellenőrzése a DevTools Network tabban...');
+        }
+
+        // Auto-initialize after page load
+        document.addEventListener('DOMContentLoaded', function() {
+            log('DOM betöltve, várakozás a script betöltésére...');
+            
+            setTimeout(function() {
+                initializeChatbot();
+            }, 1000);
+        });
+
+        // Global error handling
+        window.addEventListener('error', function(event) {
+            log(`Globális hiba: ${event.message} (${event.filename}:${event.lineno})`);
+        });
+
+        log('Teszt oldal inicializálva');
+    </script>
+</body>
+</html>

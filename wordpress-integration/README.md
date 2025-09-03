@@ -10,8 +10,8 @@ Helyezd el ezt a kódot a WordPress oldal `<head>` szakaszában vagy a footer-be
 
 ```html
 <!-- AI Talks Chatbot -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ai-talks-chatbot@latest/dist/ai-talks-chatbot.css">
-<script src="https://cdn.jsdelivr.net/npm/ai-talks-chatbot@latest/dist/ai-talks-chatbot.umd.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Lydiagyenes/aitalks-guidebot@main/dist-widget/ai-talks-chatbot.css">
+<script src="https://cdn.jsdelivr.net/gh/Lydiagyenes/aitalks-guidebot@main/dist-widget/ai-talks-chatbot.umd.js"></script>
 
 <script>
 // Alapértelmezett beállításokkal
@@ -114,8 +114,8 @@ Ha a chatbotot közvetlenül a témába szeretnéd beágyazni, add hozzá ezt a 
 ```php
 function add_ai_talks_chatbot() {
     ?>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ai-talks-chatbot@latest/dist/ai-talks-chatbot.css">
-    <script src="https://cdn.jsdelivr.net/npm/ai-talks-chatbot@latest/dist/ai-talks-chatbot.umd.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Lydiagyenes/aitalks-guidebot@main/dist-widget/ai-talks-chatbot.css">
+    <script src="https://cdn.jsdelivr.net/gh/Lydiagyenes/aitalks-guidebot@main/dist-widget/ai-talks-chatbot.umd.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             window.initAITalksChatbot({

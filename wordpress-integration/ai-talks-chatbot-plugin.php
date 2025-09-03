@@ -237,17 +237,38 @@ class AITalksChatbotPlugin {
         
         ?>
         <!-- AI Talks Chatbot -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ai-talks-chatbot@latest/dist/ai-talks-chatbot.css">
-        <script src="https://cdn.jsdelivr.net/npm/ai-talks-chatbot@latest/dist/ai-talks-chatbot.umd.js"></script>
+        <script>
+            console.log('AI Talks Chatbot: Loading chatbot on page', window.location.href);
+        </script>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Lydiagyenes/aitalks-guidebot@main/dist-widget/ai-talks-chatbot.css" onload="console.log('AI Talks Chatbot: CSS loaded')" onerror="console.error('AI Talks Chatbot: CSS failed to load')">
+        <script src="https://cdn.jsdelivr.net/gh/Lydiagyenes/aitalks-guidebot@main/dist-widget/ai-talks-chatbot.umd.js" onload="console.log('AI Talks Chatbot: JS loaded')" onerror="console.error('AI Talks Chatbot: JS failed to load')"></script>
         <script>
         document.addEventListener('DOMContentLoaded', function() {
-            if (typeof window.initAITalksChatbot === 'function') {
-                window.initAITalksChatbot({
-                    position: '<?php echo esc_js($position); ?>',
-                    primaryColor: '<?php echo esc_js($color); ?>',
-                    containerClass: 'wp-ai-talks-chatbot'
-                });
-            }
+            console.log('AI Talks Chatbot: DOM loaded, checking for function...');
+            
+            // Timeout for better debugging
+            setTimeout(function() {
+                if (typeof window.initAITalksChatbot === 'function') {
+                    console.log('AI Talks Chatbot: Initializing with config:', {
+                        position: '<?php echo esc_js($position); ?>',
+                        primaryColor: '<?php echo esc_js($color); ?>'
+                    });
+                    
+                    try {
+                        window.initAITalksChatbot({
+                            position: '<?php echo esc_js($position); ?>',
+                            primaryColor: '<?php echo esc_js($color); ?>',
+                            containerClass: 'wp-ai-talks-chatbot'
+                        });
+                        console.log('AI Talks Chatbot: Successfully initialized');
+                    } catch (error) {
+                        console.error('AI Talks Chatbot: Initialization error:', error);
+                    }
+                } else {
+                    console.error('AI Talks Chatbot: initAITalksChatbot function not found. Available functions:', Object.keys(window).filter(k => k.includes('AI')));
+                }
+            }, 100);
         });
         </script>
         <?php
