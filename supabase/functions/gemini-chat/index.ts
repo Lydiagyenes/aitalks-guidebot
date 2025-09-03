@@ -112,12 +112,13 @@ KIEGÉSZÍTŐ TUDÁSBÁZIS (faktuális kérdésekhez válaszolj ezek alapján):
 - Csonka Zsolt (Amazing AI): Copywriter 2.0 – AI-karmesteri szemlélet.
 - Sabján László & Kertvéllesy András (AI Squad): Voice AI az ügyfélszolgálatban.
 
-6) Cégek – részletesen
-- Make.com: vizuális, no-code automatizáció; AI Agentek; 2500+ integráció; drag-and-drop folyamatábra; komplex logikai feltételek; valós idejű monitoring.
-- grupoQ / Qconcursos: 35M+ felhasználó, vizsgafelkészítő ökoszisztéma; Brazília legnagyobb edtech; Caio Moretti vezeti.
-- Amazing AI: AI tanácsadás, képzések, automatizációs projektek; Németh Gábor társalapítója; Stylers Group partnerség.
-- HVG: Magyarország egyik legmeghatározóbb független hírforrása (1979); 1,5M ember/hét; Tech+Tudomány rovat; főszervező; minőségi újságírás.
-- Tengr.ai: W. Szabó Péter képgeneráló platformja; Hyperalign™ technológia; 100% felhasználói tulajdonjog; üzleti csomagok; privacy-by-design.
+6) Cégek – részletesen (ezt a blokkot csak akkor használd, ha a felhasználó konkrét cégre kérdez rá; elsőre 1-3 mondatos összegzést adj, és csak kérésre bontsd ki részletesen)
+- Make.com: Piacvezető no-code automatizációs platform, vizuális drag-and-drop interface, 2500+ integráció. Részletesen: korábbi nevén Integromat, "fogd és vidd" felülettel demokratizálja a fejlesztést. Különlegessége a vizuális szerkesztő (nem lineáris "ha-akkor" logika, hanem folyamatábra-szerű, rugalmas rendszer elágazásokkal). AI integráció: ChatGPT beépíthető, "Make AI Agents" funkció önálló döntéshozásra. Népszerű kkv-k és startupok körében.
+- grupoQ/Qconcursos: Brazília legnagyobb edtech ökoszisztémája, 35M+ regisztrált felhasználó, Caio Moretti vezeti. Részletesen: "tech for education" filozófia, digitális alapokon működő személyre szabott tanulás. A Qconcursos (2008) a vizsgafelkészítés mekkája: hatalmas kérdésadatbázis (több millió korábbi vizsgakérdés), interaktív közösség, teljes körű tananyagok, intelligens eszközök az optimalizáláshoz. Mobilapp offline funkcióval. Különböző márkák: Prisma (középiskola), QCarreiras (karrier).
+- Amazing AI: Magyar AI-tanácsadó cég, Németh Gábor társalapítója, gyakorlati AI-bevezetés szakértői. Részletesen: küldetés a misztifikált AI-lehetőségek érthetővé/hasznossá tétele. Főbb területek: AI tanácsadás és stratégiaalkotás, vállalati képzések (testreszabott, nagyvállalati környezet), AI automatizációs projektek (több nagyvállalatnál futnak), stratégiai partnerségek (pl. Stylers Group). Híd szerep a komplex technológia és piaci szereplők között.
+- HVG: Magyarország egyik legmeghatározóbb független hírforrása (1979), minőségi újságírásért ismert, hvg.hu, hetente 1,5M+ ember. Részletesen: gazdaság/politika túlmutatva társadalom/kultúra/tudomány/technológia. AI Talks főszervezője, Tech+Tudomány rovat, társadalmi párbeszéd formálása az AI-val kapcsolatban. Hiteles forrás a globális trendek magyar kontextusba helyezéséért.
+- Tengr.ai: W. Szabó Péter magyar fejlesztésű AI képgeneráló platformja, felhasználói élmény középpontban. Részletesen: Balla Attila és Zalaba Dávid közreműködésével, többnyelvű (magyar is). Megkülönböztető jegyek: kreatív szabadság (kevésbé korlátozó, Hyperalign™ technológia), 100% felhasználói tulajdonjog (kereskedelmi célra is), haladó testreszabás (stílusok, színtónusok, arc-csere), üzleti csomagok.
+- Zapier vs n8n (Lukács Bence workshop téma): Zapier = egyszerűség, "trigger-action" logika, 6000+ integráció, kezdőknek ideális lineáris folyamatokhoz. n8n = rugalmasság, vizuális node-based szerkesztő, nyílt forráskódú, saját szerverre telepíthető, összetett elágazó logikához. Mindkettő AI-vezérelt automatizációkhoz használható.
 
 7) No-code automatizálás eszközök (Lukács Bence workshopjához)
 - Zapier: "trigger-action" logika; 6000+ integráció; egyszerű, lineáris folyamatok; kezdőknek ideális.
