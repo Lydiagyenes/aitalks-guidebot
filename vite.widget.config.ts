@@ -24,7 +24,8 @@ export default defineConfig({
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === 'style.css') return 'ai-talks-chatbot.css';
           return assetInfo.name || '';
-        }
+        },
+        inlineDynamicImports: true
       }
     },
     cssCodeSplit: false,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { ChatbotWidget } from './components/Chatbot/ChatbotWidget';
+import { StandaloneChatbotWidget } from './components/Chatbot/StandaloneChatbotWidget';
 import './index.css';
 
 // Global configuration interface
@@ -13,7 +13,8 @@ interface ChatbotConfig {
 }
 
 // Standalone wrapper component that doesn't depend on React Router
-const StandaloneChatbot: React.FC<ChatbotConfig> = ({ position = 'bottom-right', containerClass = '' }) => {
+const StandaloneChatbot: React.FC<ChatbotConfig> = (props) => {
+  const { position = 'bottom-right', containerClass = '', ...config } = props;
   const positionClasses = {
     'bottom-right': 'bottom-6 right-6',
     'bottom-left': 'bottom-6 left-6',
@@ -23,7 +24,7 @@ const StandaloneChatbot: React.FC<ChatbotConfig> = ({ position = 'bottom-right',
 
   return (
     <div className={`fixed ${positionClasses[position]} z-50 ${containerClass}`}>
-      <ChatbotWidget />
+      <StandaloneChatbotWidget {...props} />
     </div>
   );
 };

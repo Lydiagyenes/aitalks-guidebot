@@ -62,6 +62,9 @@ export const StandaloneChatbotWidget: React.FC<ChatbotConfig> = ({
 
     setTimeout(async () => {
       try {
+        // Update ticket mention counter here before getting response
+        setTicketMentionCounter(prev => prev + 1);
+        
         const responseText = await getAIResponse(inputValue);
         const botMessage: Message = {
           id: (Date.now() + 1).toString(),
@@ -157,8 +160,7 @@ export const StandaloneChatbotWidget: React.FC<ChatbotConfig> = ({
   const getFallbackResponse = (userInput: string, topic: string): string => {
     const input = userInput.toLowerCase();
     
-    // Update ticket mention counter
-    setTicketMentionCounter(prev => prev + 1);
+    // Use current counter value without updating it here
     const shouldMentionTickets = ticketMentionCounter % 5 === 0;
 
     if (input.includes('program') || input.includes('menetrend') || input.includes('időpont') || input.includes('mikor')) {

@@ -55,6 +55,9 @@ export const ChatbotWidget = () => {
     // Get AI response using Gemini
     setTimeout(async () => {
       try {
+        // Update ticket mention counter here before getting response
+        setTicketMentionCounter(prev => prev + 1);
+        
         const responseText = await getAIResponse(inputValue);
         const botMessage: Message = {
           id: (Date.now() + 1).toString(),
@@ -138,7 +141,6 @@ export const ChatbotWidget = () => {
 
   const getAIResponse = async (userInput: string): Promise<string> => {
     try {
-      const { supabase } = await import('@/integrations/supabase/client');
       const topic = detectTopic(userInput);
       const history = messages.slice(-3).map(m => ({ text: m.text, isBot: m.isBot }));
       
@@ -166,8 +168,7 @@ export const ChatbotWidget = () => {
   const getFallbackResponse = (userInput: string, topic: string): string => {
     const input = userInput.toLowerCase();
     
-    // Update ticket mention counter
-    setTicketMentionCounter(prev => prev + 1);
+    // Use current counter value without updating it here
     const shouldMentionTickets = ticketMentionCounter % 5 === 0;
 
     // Program / időpont
