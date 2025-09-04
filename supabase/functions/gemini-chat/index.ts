@@ -211,9 +211,9 @@ Válaszolj magyarul a következő kérdésre/üzenetre:`;
     const topicFallbacks = {
       program: 'Köszi az üzeneted! A konferencia november 20-án lesz Budapesten. Melyik előadás érdekel leginkább? ✨',
       workshop: 'Köszi az üzenetet! Délután párhuzamos workshopok lesznek. Melyik témakör lenne számodra leginkább hasznos? 🛠️',
-      location: 'Helyszín: Bálna, Budapest, Fővám tér 11-12. Segítsek útvonalat tervezni? 📍',
-      parking: 'Parkolás: Bálna mélygarázs 350 Ft/óra vagy utcai. Segítsek dönteni a parkolási opcióban? 🚗',
-      restaurant: 'Sok jó étterem van a környéken! Foglaljak asztalt valahol? 🍽️',
+      location: 'Helyszín: Bálna, Budapest, Fővám tér 11-12. Segítsek parkolási lehetőséget keresni? 📍',
+      parking: 'Parkolás: Bálna mélygarázs 450 Ft/óra vagy utcai. Segítsek dönteni a parkolási opcióban? 🚗',
+      restaurant: 'Sok jó étterem van a környéken! Szeretnél többet tudni a lehetőségekről? 🍽️',
       ticket: 'Super Early Bird árak szeptember 30-ig! Melyik jegytípus lenne ideális számodra? 🎟️',
       speaker: 'Kiváló előadóink lesznek! Kérsz részleteket valamelyik előadásról? 🎤',
       general: 'Köszi az üzeneted! Miben tudok még segíteni? ✨'
