@@ -12,8 +12,12 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let topicHint = 'general';
+  let lastFollowups: string[] | undefined = undefined;
   try {
     const { message, history, topic_hint, last_followups } = await req.json();
+    topicHint = topic_hint || 'general';
+    lastFollowups = last_followups;
     
     if (!message) {
       throw new Error('Message is required');
@@ -219,7 +223,7 @@ Válaszolj magyarul a következő kérdésre/üzenetre:`;
       general: 'Köszi az üzeneted! Miben tudok még segíteni? ✨'
     };
     
-    const fallbackResponse = topicFallbacks[topic_hint as keyof typeof topicFallbacks] || topicFallbacks.general;
+    const fallbackResponse = topicFallbacks[topicHint as keyof typeof topicFallbacks] || topicFallbacks.general;
     
     return new Response(JSON.stringify({ response: fallbackResponse }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
