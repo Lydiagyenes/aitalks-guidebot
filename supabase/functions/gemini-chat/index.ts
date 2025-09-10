@@ -29,7 +29,7 @@ serve(async (req) => {
 
 INFORMÁCIÓK A KONFERENCIÁRÓL:
 - Név: AI TALKS by HVG & Amazing AI
-- Jegyvásárlás nyitás: 2025. szeptember 3. - ekkor kezdődik a jegyvásárlás!
+- Jegyvásárlás nyitás: 2025. szeptember 3. - ekkor kezdődött a jegyvásárlás!
 - Rendezvény időpontja: 2025. november 20. - ez a tényleges konferencia napja
 - Helyszín: Bálna, Budapest, Fővám tér 11-12, 1093
 - Szervezők: HVG & Amazing AI
@@ -38,8 +38,7 @@ INFORMÁCIÓK A KONFERENCIÁRÓL:
 - Fő üzenet: "Ne maradj le a startről!"
 
 AKTUÁLIS HELYZET:
-- Szeptember 3-án megnyílt a jegyvásárlás - ez csak a jegyértékesítés kezdete!
-- Még early bird árakon vásárolhatnak az érdeklődők jegyeket
+- Jelenleg early bird árakon vásárolhatnak az érdeklődők jegyeket
 - A tényleges konferencia november 20-án lesz
 - Ez az AI mint üzlettárs szemléletváltó konferenciája
 - Az új korszak vezetőinek szól
