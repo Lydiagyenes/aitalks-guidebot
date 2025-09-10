@@ -80,7 +80,7 @@ KIEGÉSZÍTŐ TUDÁSBÁZIS (faktuális kérdésekhez válaszolj ezek alapján):
 - EscoBar & Cafe (Bálna): laza hangulat, magyar/nemzetközi fogások és pizza; árak nem részletezettek online; allergén infóhoz javasolt telefon/e-mail; ~2 perc (97 m) a Bálnától.
 
 2) Parkolás
-- Bálna Honvédelmi Központ mélygarázs: 350 Ft/óra, a Bálna épületében (cím: Fővám tér 11-12, 1093).
+- Bálna Honvédelmi Központ mélygarázs: 450 Ft/óra, a Bálna épületében (cím: Fővám tér 11-12, 1093).
 - Csarnok Parkoló: Csarnok tér 2, 1093 (~3-4 perc séta).
 - Care Park Liliom: Liliom u. 43-45, 1094 (~10-12 perc séta).
 - Utcai parkolás (IX. ker., "A" zóna): 600 Ft/óra, munkanap 8:00–22:00, jellemzően max. 3 óra; hétvégén/ünnepnapokon díjmentes. Rendezvények idején gyorsan telik: érdemes korán érkezni vagy közösségi közlekedést választani.
