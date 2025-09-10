@@ -14,8 +14,10 @@ serve(async (req) => {
 
   let topicHint = 'general';
   let lastFollowups: string[] | undefined = undefined;
+  let originalMessage = '';
   try {
     const { message, history, topic_hint, last_followups } = await req.json();
+    originalMessage = message || '';
     topicHint = topic_hint || 'general';
     lastFollowups = last_followups;
     
@@ -192,6 +194,36 @@ Válaszolj magyarul a következő kérdésre/üzenetre:`;
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Gemini API error:', errorText);
+
+      // Retry once with secondary API key if rate-limited
+      if (response.status === 429) {
+        const geminiApiKey2 = Deno.env.get('Gemini_API2');
+        if (geminiApiKey2 && geminiApiKey2 !== geminiApiKey) {
+          console.log('Retrying Gemini request with secondary API key due to 429');
+          const retryResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey2}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: `${systemPrompt}\n\nFelhasználó üzenete: ${message}` }] }],
+              generationConfig: { temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 1024 }
+            }),
+          });
+
+          if (retryResp.ok) {
+            const retryData = await retryResp.json();
+            const retryText = retryData?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (retryText) {
+              return new Response(JSON.stringify({ response: retryText }), {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              });
+            }
+          } else {
+            const retryErrText = await retryResp.text();
+            console.error('Gemini API retry error:', retryErrText);
+          }
+        }
+      }
+
       throw new Error(`Gemini API error: ${response.status}`);
     }
 
@@ -223,7 +255,28 @@ Válaszolj magyarul a következő kérdésre/üzenetre:`;
       general: 'Köszi az üzeneted! Miben tudok még segíteni? ✨'
     };
     
-    const fallbackResponse = topicFallbacks[topicHint as keyof typeof topicFallbacks] || topicFallbacks.general;
+    // Heurisztikus témadetektálás, ha a topicHint túl általános
+    const msg = (originalMessage || '').toLowerCase();
+    let fallbackTopic: keyof typeof topicFallbacks = (topicHint as keyof typeof topicFallbacks) || 'general';
+    if (fallbackTopic === 'general') {
+      if (msg.includes('előadó') || msg.includes('előad') || msg.includes('kik adnak elő') || msg.includes('ki beszél') || msg.includes('speaker')) {
+        fallbackTopic = 'speaker';
+      } else if (msg.includes('program') || msg.includes('menetrend') || msg.includes('időpont') || msg.includes('mikor')) {
+        fallbackTopic = 'program';
+      } else if (msg.includes('workshop') || msg.includes('műhely') || msg.includes('gyakorlat')) {
+        fallbackTopic = 'workshop';
+      } else if (msg.includes('helyszín') || msg.includes('hol') || msg.includes('cím') || msg.includes('bálna')) {
+        fallbackTopic = 'location';
+      } else if (msg.includes('parkol') || msg.includes('parkoló') || msg.includes('mélygarázs')) {
+        fallbackTopic = 'parking';
+      } else if (msg.includes('étterem') || msg.includes('ebéd') || msg.includes('vacsora')) {
+        fallbackTopic = 'restaurant';
+      } else if (msg.includes('jegy') || msg.includes('ár') || msg.includes('költség') || msg.includes('mennyibe')) {
+        fallbackTopic = 'ticket';
+      }
+    }
+
+    const fallbackResponse = topicFallbacks[fallbackTopic] || topicFallbacks.general;
     
     return new Response(JSON.stringify({ response: fallbackResponse }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
