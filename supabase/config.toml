@@ -2,3 +2,6 @@ project_id = "jugxnvkjyzgepkzzqjwl"
 
 [functions.gemini-chat]
 verify_jwt = false
+
+[functions.kb-upsert]
+verify_jwt = false
