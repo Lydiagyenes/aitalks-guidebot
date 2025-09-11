@@ -43,10 +43,19 @@ export const KnowledgeSeeder: React.FC = () => {
   }, []);
 
   const payload = useMemo(() => ({
-    title: "AI Talks 2024 – Jegyek és helyszíni tudnivalók (seed)",
+    title: "AI Talks 2024 – Jegyek és helyszíni tudnivalók (seed v2)",
     tags: [
-      "hu","faq","jegyek","kedvezmenyek","early-bird","shownote","ertekesites",
-      "csoportos-kedvezmeny","logisztika","parkolas","ruhatar","bufe","vendeglatas","balna"
+      // General
+      "hu","faq",
+      // Ticketing + pricing (match mapTopicToTags)
+      "ticket","jegy","pricing","ár",
+      // Parking
+      "parking","parkolás",
+      // Food / restaurant
+      "restaurant","étterem","food",
+      // Previous custom tags kept for broader searchability
+      "kedvezmenyek","early-bird","shownote","ertekesites","csoportos-kedvezmeny",
+      "logisztika","parkolas","ruhatar","bufe","vendeglatas","balna"
     ],
     source_url: "internal:seed",
     metadata: { language: "hu", category: "faq", source: "manual-seed" },
