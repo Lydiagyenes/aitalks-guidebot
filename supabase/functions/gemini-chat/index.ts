@@ -165,7 +165,7 @@ Válaszolj barátságosan, természetesen, és ha követő kérdéseket javasols
 
 // Helper function to call Gemini API
 async function getGeminiResponse(systemPrompt: string, message: string, apiKey: string): Promise<string> {
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
