@@ -79,17 +79,26 @@ TOPIC HINT: ${topicHint || 'általános'}`;
 
     try {
       // Generate embedding for the user's message
+      console.log('[RAG] Generating embedding for query:', originalMessage);
       const queryEmbedding = await generateEmbedding(originalMessage, currentApiKey);
       
       if (queryEmbedding) {
+        console.log('[RAG] Embedding generated successfully, dimensions:', queryEmbedding.length);
+        
         // Retrieve relevant knowledge chunks
+        console.log('[RAG] Calling match_knowledge with match_count: 6, filter_tags:', filterTags);
         const { data: contexts, error: contextError } = await supabase.rpc('match_knowledge', {
           query_embedding: queryEmbedding,
           match_count: 6,
           filter_tags: filterTags
         });
 
+        if (contextError) {
+          console.error('[RAG] Error calling match_knowledge:', contextError);
+        }
+        
         if (!contextError && contexts && contexts.length > 0) {
+          console.log('[RAG] Found', contexts.length, 'relevant contexts');
           usedContext = contexts;
           
           // Build context string
@@ -117,10 +126,12 @@ Válaszolj barátságosan, természetesen, és ha követő kérdéseket javasols
           // First attempt with primary API key and context
           responseFromAI = await getGeminiResponse(contextualSystemPrompt, originalMessage, currentApiKey);
         } else {
+          console.log('[RAG] No contexts found, using original system prompt');
           // No context found, use original system prompt
           responseFromAI = await getGeminiResponse(systemPrompt, originalMessage, currentApiKey);
         }
       } else {
+        console.log('[RAG] Failed to generate embedding, fallback to original approach');
         // Failed to generate embedding, fallback to original approach
         responseFromAI = await getGeminiResponse(systemPrompt, originalMessage, currentApiKey);
       }
@@ -265,6 +276,7 @@ function mapTopicToTags(topic_hint?: string): string[] | null {
 // Generate embedding using Gemini text-embedding-004
 async function generateEmbedding(text: string, apiKey: string): Promise<number[] | null> {
   try {
+    console.log('[Embedding] Generating for text length:', text.length);
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
@@ -279,14 +291,23 @@ async function generateEmbedding(text: string, apiKey: string): Promise<number[]
     });
 
     if (!response.ok) {
-      console.error('Embedding API error:', response.status, await response.text());
+      const errorText = await response.text();
+      console.error('[Embedding] API error:', response.status, errorText);
       return null;
     }
 
     const data = await response.json();
-    return data.embedding?.values || null;
+    const embeddingValues = data.embedding?.values;
+    
+    if (!embeddingValues) {
+      console.error('[Embedding] No embedding values in response:', JSON.stringify(data));
+      return null;
+    }
+    
+    console.log('[Embedding] Successfully generated, dimensions:', embeddingValues.length);
+    return embeddingValues;
   } catch (error) {
-    console.error('Error generating embedding:', error);
+    console.error('[Embedding] Error generating embedding:', error);
     return null;
   }
 }
