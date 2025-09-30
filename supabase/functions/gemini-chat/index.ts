@@ -163,40 +163,35 @@ Válaszolj barátságosan, természetesen, és ha követő kérdéseket javasols
   }
 });
 
-// Helper function to call Gemini API
-async function getGeminiResponse(systemPrompt: string, message: string, apiKey: string): Promise<string> {
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-    method: 'POST',
+// Helper function to call AI via Lovable AI Gateway
+async function getGeminiResponse(systemPrompt: string, message: string, _apiKey: string): Promise<string> {
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+  const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${LOVABLE_API_KEY}`,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      contents: [{
-        parts: [{
-          text: `${systemPrompt}\n\nFelhasználó üzenete: ${message}`
-        }]
-      }],
-      generationConfig: {
-        temperature: 0.7,
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 1024,
-      }
+      model: "google/gemini-2.5-flash",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: message }
+      ]
     }),
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+  if (!resp.ok) {
+    const t = await resp.text();
+    throw new Error(`AI gateway error: ${resp.status} - ${t}`);
   }
 
-  const data = await response.json();
-  
-  if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
-    throw new Error('Invalid response from Gemini API');
-  }
-
-  return data.candidates[0].content.parts[0].text;
+  const data = await resp.json();
+  const content: string | undefined = data?.choices?.[0]?.message?.content;
+  if (!content) throw new Error("Invalid response from AI gateway");
+  return content;
 }
 
 // Fallback response based on topic
