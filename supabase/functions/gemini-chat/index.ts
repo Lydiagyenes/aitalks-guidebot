@@ -147,18 +147,21 @@ TOPIC HINT: ${topicHint || 'általános'}`;
             .map((ctx: any, idx: number) => `KONTEXTUS #${idx + 1}:\n${ctx.content}\nCímkék: ${ctx.tags.join(', ')}\n`)
             .join('\n---\n');
 
+          // Detect if context is from web scraping
+          const isWebScraping = contexts[0]?.metadata?.source === 'web_scraping';
+          
           // Enhanced system prompt with context
           const contextualSystemPrompt = `${systemPrompt}
 
 KRITIKUS: Az alábbi kontextus a LEGFONTOSABB információforrásod. KIZÁRÓLAG ebből és az alapinformációkból válaszolj!
 
-RELEVÁNS KONTEXTUS A TUDÁSBÁZISBÓL:
+${isWebScraping ? 'FIGYELEM: Az alábbi információ az élő aitalks.hu weboldalról származik (valós időben letöltve):' : 'RELEVÁNS KONTEXTUS A TUDÁSBÁZISBÓL:'}
 ${contextString}
 
 VÁLASZADÁSI PRIORITÁS:
 1. ELŐSZÖR: Keress választ a fenti kontextusban
 2. MÁSODSZOR: Ha nincs a kontextusban, de az alapinformációk között megtalálod, akkor onnan válaszolj
-3. HARMADSZOR: Ha egyik sem tartalmazza, előbb próbálj szinonimákkal és variációkkal keresni a kontextusban; ha továbbra sincs találat, mondd: "Erről most nincs megbízható információ a tudásbázisban." és kérj rövid pontosítást.
+3. HARMADSZOR: Ha egyik sem tartalmazza, előbb próbálj szinonimákkal és variációkkal keresni a kontextusban; ha továbbra sincs találat, mondd: "Erről most nincs megbízható információ${isWebScraping ? '' : ' a tudásbázisban'}." és kérj rövid pontosítást.
 
 NE HASZNÁLD az "általános tudásodat" vagy ne találj ki semmit. CSAK a kontextus és az alapinformációk!
 
@@ -214,8 +217,39 @@ Válaszolj barátságosan, természetesen, és ha követő kérdéseket javasols
                 responseFromAI = textResponse;
               }
             } else {
-              console.log('[RAG] No text hits, using original system prompt');
-              responseFromAI = await getGeminiResponse(systemPrompt, originalMessage, currentApiKey);
+              console.log('[RAG] No text hits, checking if web scraping is needed');
+              // FALLBACK 4: Web scraping from aitalks.hu if relevant
+              if (originalMessage.toLowerCase().includes('aitalks') || 
+                  originalMessage.toLowerCase().includes('honlap') || 
+                  originalMessage.toLowerCase().includes('weboldal') ||
+                  originalMessage.toLowerCase().includes('oldalon')) {
+                console.log('[SCRAPE] Attempting to scrape aitalks.hu');
+                const scrapedContent = await scrapeWebsite('https://aitalks.hu');
+                
+                if (scrapedContent) {
+                  console.log('[SCRAPE] Successfully scraped website, using as context');
+                  const webCtxPrompt = `${systemPrompt}\n\nKRITIKUS: Az alábbi információ az élő aitalks.hu weboldalról származik (valós időben letöltve):\n\n${scrapedContent}\n\nVÁLASZADÁSI PRIORITÁS:\n1. ELŐSZÖR: Keress választ a fenti webes kontextusban\n2. MÁSODSZOR: Ha nincs a kontextusban, de az alapinformációk között megtalálod, akkor onnan válaszolj\n3. HARMADSZOR: Ha egyik sem tartalmazza, mondd: "Erről most nincs megbízható információ."\n\nNE HASZNÁLD az "általános tudásodat" vagy ne találj ki semmit. CSAK a kontextus és az alapinformációk!`;
+                  
+                  const webResponse = await getGeminiResponse(webCtxPrompt, originalMessage, currentApiKey);
+                  if (webResponse === 'RATE_LIMITED') {
+                    rateLimitError = true;
+                    responseFromAI = geminiApiKey2 ? await getGeminiResponse(webCtxPrompt, originalMessage, geminiApiKey2) : getFallbackResponse(originalMessage, topicHint);
+                    if (responseFromAI === 'RATE_LIMITED') responseFromAI = getFallbackResponse(originalMessage, topicHint);
+                  } else if (webResponse === 'PAYMENT_REQUIRED') {
+                    paymentError = true;
+                    responseFromAI = getFallbackResponse(originalMessage, topicHint);
+                  } else {
+                    responseFromAI = webResponse;
+                  }
+                  usedContext = [{ id: 'web_scrape', content: scrapedContent.substring(0, 200) + '...', tags: ['web_scraping'], metadata: { source: 'aitalks.hu', type: 'live_scrape' } }];
+                } else {
+                  console.log('[SCRAPE] Failed to scrape, using original system prompt');
+                  responseFromAI = await getGeminiResponse(systemPrompt, originalMessage, currentApiKey);
+                }
+              } else {
+                console.log('[RAG] No web scraping needed, using original system prompt');
+                responseFromAI = await getGeminiResponse(systemPrompt, originalMessage, currentApiKey);
+              }
             }
           } else {
             console.log('[RAG] No keywords extracted, using original system prompt');
@@ -444,6 +478,54 @@ function extractKeywords(text: string): string[] {
   ]);
   const keywords = tokens.filter(w => w.length >= 3 && !stop.has(w));
   return Array.from(new Set(keywords)).slice(0, 6);
+}
+
+// Web scraping function for aitalks.hu
+async function scrapeWebsite(url: string): Promise<string | null> {
+  try {
+    console.log(`[SCRAPE] Fetching ${url}`);
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; AITalksBot/1.0)'
+      }
+    });
+    
+    if (!response.ok) {
+      console.error(`[SCRAPE] Failed to fetch ${url}: ${response.status}`);
+      return null;
+    }
+    
+    const html = await response.text();
+    
+    // Remove script and style tags
+    let text = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+                   .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+    
+    // Remove HTML tags
+    text = text.replace(/<[^>]+>/g, ' ');
+    
+    // Decode HTML entities
+    text = text.replace(/&nbsp;/g, ' ')
+               .replace(/&amp;/g, '&')
+               .replace(/&lt;/g, '<')
+               .replace(/&gt;/g, '>')
+               .replace(/&quot;/g, '"')
+               .replace(/&#39;/g, "'");
+    
+    // Clean up whitespace
+    text = text.replace(/\s+/g, ' ').trim();
+    
+    // Limit to reasonable size (first 8000 chars to avoid token limits)
+    if (text.length > 8000) {
+      text = text.substring(0, 8000) + '...';
+    }
+    
+    console.log(`[SCRAPE] Successfully scraped ${text.length} characters from ${url}`);
+    return text;
+  } catch (error) {
+    console.error(`[SCRAPE] Error scraping ${url}:`, error);
+    return null;
+  }
 }
 
 // Generate embedding using Gemini text-embedding-004
