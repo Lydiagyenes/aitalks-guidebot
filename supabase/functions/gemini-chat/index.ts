@@ -133,10 +133,11 @@ TOPIC HINT: ${topicHint || 'általános'}`;
         console.log('[RAG] Embedding generated successfully, dimensions:', queryEmbedding.length);
         
         // FIRST PASS: Retrieve relevant knowledge chunks with tag filtering
-        console.log('[RAG] First pass with match_count: 10, filter_tags:', filterTags);
+        const firstPassCount = mentionedSpeaker ? 20 : 15; // More results if speaker mentioned
+        console.log('[RAG] First pass with match_count:', firstPassCount, ', filter_tags:', filterTags);
         let { data: contexts, error: contextError } = await supabase.rpc('match_knowledge', {
           query_embedding: queryEmbedding,
-          match_count: 10,
+          match_count: firstPassCount,
           filter_tags: filterTags
         });
 
@@ -149,12 +150,20 @@ TOPIC HINT: ${topicHint || 'általános'}`;
         const maxSimilarity = hasSufficientResults ? Math.max(...contexts.map((c: any) => c.similarity || 0)) : 0;
         console.log(`[RAG] First pass: ${contexts?.length || 0} results, max similarity: ${maxSimilarity.toFixed(3)}`);
         
+        // Log top results for debugging
+        if (contexts && contexts.length > 0) {
+          console.log('[RAG] Top 3 results:');
+          contexts.slice(0, 3).forEach((ctx: any, i: number) => {
+            console.log(`  ${i + 1}. [${ctx.similarity.toFixed(3)}] ${ctx.content.substring(0, 100)}...`);
+          });
+        }
+        
         // SECOND PASS: if no results or low similarity and we used tag filtering, try without tags
-        if ((!hasSufficientResults || maxSimilarity < 0.72) && filterTags !== null) {
-          console.log('[RAG] Second pass without tag filtering');
+        if ((!hasSufficientResults || maxSimilarity < 0.65) && filterTags !== null) {
+          console.log('[RAG] Second pass without tag filtering (threshold lowered)');
           const { data: secondPassContexts, error: secondPassError } = await supabase.rpc('match_knowledge', {
             query_embedding: queryEmbedding,
-            match_count: 10,
+            match_count: 20,
             filter_tags: null
           });
           
@@ -171,10 +180,13 @@ TOPIC HINT: ${topicHint || 'általános'}`;
         }
         
         if (!contextError && contexts && contexts.length > 0) {
-          // Check if contexts are high quality (max similarity > 0.5 for meaningful use)
+          // Check if contexts are high quality (lowered threshold for better recall)
           const maxSim = Math.max(...contexts.map((c: any) => c.similarity || 0));
-          if (maxSim < 0.45) {
-            console.log(`[RAG] Context quality too low (max: ${maxSim.toFixed(3)}), attempting web scraping`);
+          console.log(`[RAG] Using contexts, max similarity: ${maxSim.toFixed(3)}`);
+          
+          // Only scrape if really low quality AND no speaker mentioned
+          if (maxSim < 0.32 && !mentionedSpeaker) {
+            console.log(`[RAG] Context quality very low (max: ${maxSim.toFixed(3)}), attempting web scraping`);
             const scrapedContent = await scrapeWebsite('https://aitalks.hu');
             if (scrapedContent) {
               console.log('[SCRAPE] Using scraped content due to low context quality');
@@ -242,16 +254,22 @@ Válaszolj barátságosan, természetesen, és ha követő kérdéseket javasols
           console.log('[RAG] No contexts from embeddings, attempting keyword text search');
           // Fallback: simple keyword text search in knowledge base
           const keywords = extractKeywords(normalizedMessage);
+          console.log('[RAG] Extracted keywords for text search:', keywords);
+          
           if (keywords.length > 0) {
-            const orFilters = keywords.slice(0, 3).map((kw) => `content.ilike.%${kw}%`).join(',');
+            // Use more keywords and get more results
+            const orFilters = keywords.slice(0, 5).map((kw) => `content.ilike.%${kw}%`).join(',');
             const { data: textHits, error: textErr } = await supabase
               .from('knowledge_chunks')
               .select('id, content, tags')
               .or(orFilters)
-              .limit(5);
+              .limit(10);
 
             if (!textErr && textHits && textHits.length > 0) {
               console.log('[RAG] Text search found', textHits.length, 'hits');
+              textHits.forEach((hit: any, i: number) => {
+                console.log(`  ${i + 1}. ${hit.content.substring(0, 80)}...`);
+              });
               usedContext = textHits as any[];
               const ctxStr = textHits
                 .map((ctx: any, idx: number) => `KONTEXTUS #${idx + 1}:\n${ctx.content}\nCímkék: ${ctx.tags?.join(', ') || ''}\n`)
@@ -558,26 +576,37 @@ function detectSpeakerName(text: string): string | null {
   return null;
 }
 
-// Enhanced keyword extractor with better Hungarian stopwords
+// Enhanced keyword extractor with better Hungarian stopwords and time-related terms
 function extractKeywords(text: string): string[] {
   const original = text.toLowerCase();
   const withoutPunct = original.replace(/[^\p{L}\p{N}\s]/gu, ' ');
   const tokens = withoutPunct.split(/\s+/).filter(Boolean);
+  
+  // Hungarian stopwords
   const stop = new Set([
     'a','az','és','vagy','hogy','mi','mit','ki','kik','is','van','lesz','most','nem','de',
     'ra','re','ban','ben','egy','ha','akkor','azt','arra','erről','rol','ról','meg','el',
     'fel','le','be','által','majd','után','előtt','neki','nekem','őt','őket','itt','ott',
-    'mert','mint','ezt','azon','ezen','minden','lehet','volt','kell','sem','még'
+    'mert','mint','ezt','azen','ezen','minden','lehet','volt','kell','sem','még'
   ]);
+  
+  // Extract all tokens but prioritize names and important terms
   const keywords = tokens.filter(w => w.length >= 2 && !stop.has(w));
+  
+  // For time-related questions, also include variations
+  const hasTimeQuestion = /hanytol|hanytol|mikor|idopont|ora/.test(original);
+  if (hasTimeQuestion) {
+    // Add time-related terms to help search
+    keywords.push('idopont', 'ora', 'program', 'eloadok', 'workshop');
+  }
   
   // If no keywords after filtering, return original tokens (avoid empty results)
   if (keywords.length === 0 && tokens.length > 0) {
     console.log('[KEYWORD] All tokens were stopwords, using original tokens');
-    return tokens.filter(w => w.length >= 2).slice(0, 6);
+    return tokens.filter(w => w.length >= 2).slice(0, 8);
   }
   
-  return Array.from(new Set(keywords)).slice(0, 6);
+  return Array.from(new Set(keywords)).slice(0, 8);
 }
 
 // Web scraping function for aitalks.hu
