@@ -93,6 +93,39 @@ TOPIC HINT: ${topicHint || 'általános'}`;
     let paymentError = false;
 
     try {
+      // Check if query is too short (< 3 chars) - these are usually context-dependent
+      const isVeryShortQuery = originalMessage.trim().length < 3;
+      if (isVeryShortQuery) {
+        console.log('[RAG] Very short query detected, checking for web scraping need');
+        // For very short queries, check if we should scrape website based on conversation context
+        if (history && Array.isArray(history) && history.length > 0) {
+          const recentContext = history.slice(-3).map((h: any) => h.content || '').join(' ').toLowerCase();
+          if (recentContext.includes('aitalks') || recentContext.includes('honlap') || recentContext.includes('weboldal')) {
+            console.log('[SCRAPE] Context suggests website scraping for short query');
+            const scrapedContent = await scrapeWebsite('https://aitalks.hu');
+            if (scrapedContent) {
+              const webCtxPrompt = `${systemPrompt}\n\nFIGYELEM: Az alábbi információ az élő aitalks.hu weboldalról származik:\n\n${scrapedContent}\n\nVálaszolj a felhasználó rövid kérdésére ("${originalMessage}") a fenti kontextus alapján.`;
+              responseFromAI = await getGeminiResponse(webCtxPrompt, originalMessage, currentApiKey);
+              if (responseFromAI !== 'RATE_LIMITED' && responseFromAI !== 'PAYMENT_REQUIRED') {
+                usedContext = [{ id: 'web_scrape', content: scrapedContent.substring(0, 200) + '...', tags: ['web_scraping'], metadata: { source: 'aitalks.hu' } }];
+                return new Response(
+                  JSON.stringify({ 
+                    response: responseFromAI,
+                    metadata: {
+                      used_context_count: 1,
+                      context_ids: ['web_scrape'],
+                      source: 'web_scraping'
+                    }
+                  }),
+                  { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+                );
+              }
+            }
+          }
+        }
+        // Fall through to normal processing if scraping didn't work
+      }
+      
       // Generate embedding for the user's message
       console.log('[RAG] Generating embedding for query:', originalMessage);
       const queryEmbedding = await generateEmbedding(originalMessage, currentApiKey);
@@ -139,6 +172,28 @@ TOPIC HINT: ${topicHint || 'általános'}`;
         }
         
         if (!contextError && contexts && contexts.length > 0) {
+          // Check if contexts are high quality (max similarity > 0.5 for meaningful use)
+          const maxSim = Math.max(...contexts.map((c: any) => c.similarity || 0));
+          if (maxSim < 0.45) {
+            console.log(`[RAG] Context quality too low (max: ${maxSim.toFixed(3)}), attempting web scraping`);
+            const scrapedContent = await scrapeWebsite('https://aitalks.hu');
+            if (scrapedContent) {
+              console.log('[SCRAPE] Using scraped content due to low context quality');
+              const webCtxPrompt = `${systemPrompt}\n\nFIGYELEM: Az alábbi információ az élő aitalks.hu weboldalról származik:\n\n${scrapedContent}\n\nVálaszolj a kérdésre: "${originalMessage}"`;
+              responseFromAI = await getGeminiResponse(webCtxPrompt, originalMessage, currentApiKey);
+              if (responseFromAI !== 'RATE_LIMITED' && responseFromAI !== 'PAYMENT_REQUIRED') {
+                usedContext = [{ id: 'web_scrape', content: scrapedContent.substring(0, 200) + '...', tags: ['web_scraping'], metadata: { source: 'aitalks.hu' } }];
+                return new Response(
+                  JSON.stringify({ 
+                    response: responseFromAI,
+                    metadata: { used_context_count: 1, context_ids: ['web_scrape'], source: 'web_scraping' }
+                  }),
+                  { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+                );
+              }
+            }
+          }
+          
           console.log('[RAG] Final:', contexts.length, 'relevant contexts');
           usedContext = contexts;
           
@@ -474,9 +529,16 @@ function extractKeywords(text: string): string[] {
     'a','az','és','vagy','hogy','mi','mit','ki','kik','is','van','lesz','most','nem','de',
     'ra','re','ban','ben','egy','ha','akkor','azt','arra','erről','rol','ról','meg','el',
     'fel','le','be','által','majd','után','előtt','neki','nekem','őt','őket','itt','ott',
-    'mert','mint','ezt','azon','ezen','minden','lehet','volt','kell','igen','sem','még'
+    'mert','mint','ezt','azon','ezen','minden','lehet','volt','kell','sem','még'
   ]);
-  const keywords = tokens.filter(w => w.length >= 3 && !stop.has(w));
+  const keywords = tokens.filter(w => w.length >= 2 && !stop.has(w));
+  
+  // If no keywords after filtering, return original tokens (avoid empty results)
+  if (keywords.length === 0 && tokens.length > 0) {
+    console.log('[KEYWORD] All tokens were stopwords, using original tokens');
+    return tokens.filter(w => w.length >= 2).slice(0, 6);
+  }
+  
   return Array.from(new Set(keywords)).slice(0, 6);
 }
 
