@@ -273,10 +273,17 @@ Válaszolj barátságosan, természetesen, és ha követő kérdéseket javasols
             } else {
               console.log('[RAG] No text hits, checking if web scraping is needed');
               // FALLBACK 4: Web scraping from aitalks.hu if relevant
-              if (originalMessage.toLowerCase().includes('aitalks') || 
-                  originalMessage.toLowerCase().includes('honlap') || 
-                  originalMessage.toLowerCase().includes('weboldal') ||
-                  originalMessage.toLowerCase().includes('oldalon')) {
+              const lower = originalMessage.toLowerCase();
+              const shouldScrape =
+                lower.includes('aitalks') ||
+                lower.includes('honlap') ||
+                lower.includes('weboldal') ||
+                lower.includes('oldalon') ||
+                /kik adnak|előad|előadó|program|menetrend|mikor|hol|helysz[ií]n/.test(lower) ||
+                Boolean(mentionedSpeaker) ||
+                (detectedTopic && ['speaker','program','location'].includes(detectedTopic));
+
+              if (shouldScrape) {
                 console.log('[SCRAPE] Attempting to scrape aitalks.hu');
                 const scrapedContent = await scrapeWebsite('https://aitalks.hu');
                 
@@ -306,8 +313,40 @@ Válaszolj barátságosan, természetesen, és ha követő kérdéseket javasols
               }
             }
           } else {
-            console.log('[RAG] No keywords extracted, using original system prompt');
-            responseFromAI = await getGeminiResponse(systemPrompt, originalMessage, currentApiKey);
+            console.log('[RAG] No keywords extracted, deciding on web scraping');
+            const lower = originalMessage.toLowerCase();
+            const shouldScrapeNoKw =
+              lower.includes('aitalks') ||
+              lower.includes('honlap') ||
+              lower.includes('weboldal') ||
+              lower.includes('oldalon') ||
+              /kik adnak|előad|előadó|program|menetrend|mikor|hol|helysz[ií]n/.test(lower) ||
+              Boolean(mentionedSpeaker) ||
+              (detectedTopic && ['speaker','program','location'].includes(detectedTopic));
+
+            if (shouldScrapeNoKw) {
+              console.log('[SCRAPE] Attempting to scrape aitalks.hu (no keywords)');
+              const scrapedContent = await scrapeWebsite('https://aitalks.hu');
+              if (scrapedContent) {
+                const webCtxPrompt = `${systemPrompt}\n\nKRITIKUS: Az alábbi információ az élő aitalks.hu weboldalról származik (valós időben letöltve):\n\n${scrapedContent}\n\nVÁLASZADÁSI PRIORITÁS:\n1. ELŐSZÖR: Keress választ a fenti webes kontextusban\n2. MÁSODSZOR: Ha nincs a kontextusban, de az alapinformációk között megtalálod, akkor onnan válaszolj\n3. HARMADSZOR: Ha egyik sem tartalmazza, mondd: "Erről most nincs megbízható információ."`;
+                const webResponse = await getGeminiResponse(webCtxPrompt, originalMessage, currentApiKey);
+                if (webResponse === 'RATE_LIMITED') {
+                  rateLimitError = true;
+                  responseFromAI = geminiApiKey2 ? await getGeminiResponse(webCtxPrompt, originalMessage, geminiApiKey2) : getFallbackResponse(originalMessage, topicHint);
+                  if (responseFromAI === 'RATE_LIMITED') responseFromAI = getFallbackResponse(originalMessage, topicHint);
+                } else if (webResponse === 'PAYMENT_REQUIRED') {
+                  paymentError = true;
+                  responseFromAI = getFallbackResponse(originalMessage, topicHint);
+                } else {
+                  responseFromAI = webResponse;
+                }
+                usedContext = [{ id: 'web_scrape', content: scrapedContent.substring(0, 200) + '...', tags: ['web_scraping'], metadata: { source: 'aitalks.hu', type: 'live_scrape' } }];
+              } else {
+                responseFromAI = await getGeminiResponse(systemPrompt, originalMessage, currentApiKey);
+              }
+            } else {
+              responseFromAI = await getGeminiResponse(systemPrompt, originalMessage, currentApiKey);
+            }
           }
         }
       } else {
