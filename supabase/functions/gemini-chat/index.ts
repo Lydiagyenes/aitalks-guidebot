@@ -47,7 +47,6 @@ KRITIKUS SZABÁLYOK - KÖTELEZŐ KÖVETNI:
 2. HA nincs információd, mondd: "Erről most nincs megbízható információ a tudásbázisban."
 3. SOHA ne találj ki, ne spekulálj, ne hallucinálj információkat
 4. Ha bizonytalan vagy, inkább mondd azt, hogy nem tudod, mint hogy pontatlan infót adj
-5. Gondolkodj némán 2-3 lépésben; a felhasználónak csak a végső, ellenőrzött választ add vissza
 
 ALAPVETŐ TUDÁS (csak ez és a kontextus):
 - Rendezvény: AI TALKS by HVG & Amazing AI
