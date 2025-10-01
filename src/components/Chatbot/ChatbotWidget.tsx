@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
   id: string;
@@ -14,6 +15,7 @@ interface Message {
 }
 
 export const ChatbotWidget = () => {
+  const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   const [messages, setMessages] = useState<Message[]>([
@@ -156,6 +158,25 @@ export const ChatbotWidget = () => {
       if (error) {
         console.error('Supabase function error:', error);
         return getFallbackResponse(userInput, topic);
+      }
+
+      // Check for rate limit or payment errors
+      if (data?.error === 'rate_limited' || data?.status === 429) {
+        toast({
+          title: "Túl sok kérés",
+          description: "Kérlek, várj egy kicsit mielőtt újra kérdezel. 🙏",
+          variant: "destructive",
+        });
+        return "Rövid időn belül túl sok kérdést tettél fel. Kérlek, várj egy percet és próbáld újra! 😊";
+      }
+
+      if (data?.error === 'payment_required' || data?.status === 402) {
+        toast({
+          title: "Elérted a limitet",
+          description: "Az AI használati keret kimerült. Kérlek, próbáld később!",
+          variant: "destructive",
+        });
+        return "Az AI szolgáltatás átmenetileg nem érhető el. Kérlek, próbáld meg később! 🙏";
       }
 
       return data?.response || getFallbackResponse(userInput, topic);

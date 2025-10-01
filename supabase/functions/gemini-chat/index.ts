@@ -70,14 +70,27 @@ VÁLASZADÁSI STÍLUS:
 HISTORY CONTEXT: ${history ? `Utolsó üzenetek: ${JSON.stringify(history)}` : 'Nincs korábbi kontextus'}
 TOPIC HINT: ${topicHint || 'általános'}`;
 
+    // Normalize query and detect speaker names
+    const normalizedMessage = normalizeDiacritics(originalMessage);
+    const mentionedSpeaker = detectSpeakerName(normalizedMessage);
+    
     // Map topic_hint to tags for RAG filtering + server-side topic detection
     const initialTags = mapTopicToTags(topicHint);
     const detectedTopic = detectTopicFromMessage(originalMessage);
-    const filterTags = initialTags ?? (detectedTopic ? mapTopicToTags(detectedTopic) : null);
+    let filterTags = initialTags ?? (detectedTopic ? mapTopicToTags(detectedTopic) : null);
+    
+    // If speaker name detected, skip tag filtering for broader search
+    if (mentionedSpeaker) {
+      console.log('[RAG] Speaker detected:', mentionedSpeaker, '- using no tag filter');
+      filterTags = null;
+    }
+    
     // Try RAG-enhanced response first
     let responseFromAI: string;
     let usedContext: any[] = [];
     let currentApiKey = geminiApiKey;
+    let rateLimitError = false;
+    let paymentError = false;
 
     try {
       // Generate embedding for the user's message
@@ -87,11 +100,11 @@ TOPIC HINT: ${topicHint || 'általános'}`;
       if (queryEmbedding) {
         console.log('[RAG] Embedding generated successfully, dimensions:', queryEmbedding.length);
         
-        // Retrieve relevant knowledge chunks
-        console.log('[RAG] Calling match_knowledge with match_count: 6, filter_tags:', filterTags);
-        const { data: contexts, error: contextError } = await supabase.rpc('match_knowledge', {
+        // FIRST PASS: Retrieve relevant knowledge chunks with tag filtering
+        console.log('[RAG] First pass with match_count: 10, filter_tags:', filterTags);
+        let { data: contexts, error: contextError } = await supabase.rpc('match_knowledge', {
           query_embedding: queryEmbedding,
-          match_count: 6,
+          match_count: 10,
           filter_tags: filterTags
         });
 
@@ -99,8 +112,34 @@ TOPIC HINT: ${topicHint || 'általános'}`;
           console.error('[RAG] Error calling match_knowledge:', contextError);
         }
         
+        // Check quality of first pass results
+        const hasSufficientResults = contexts && contexts.length > 0;
+        const maxSimilarity = hasSufficientResults ? Math.max(...contexts.map((c: any) => c.similarity || 0)) : 0;
+        console.log(`[RAG] First pass: ${contexts?.length || 0} results, max similarity: ${maxSimilarity.toFixed(3)}`);
+        
+        // SECOND PASS: if no results or low similarity and we used tag filtering, try without tags
+        if ((!hasSufficientResults || maxSimilarity < 0.72) && filterTags !== null) {
+          console.log('[RAG] Second pass without tag filtering');
+          const { data: secondPassContexts, error: secondPassError } = await supabase.rpc('match_knowledge', {
+            query_embedding: queryEmbedding,
+            match_count: 10,
+            filter_tags: null
+          });
+          
+          if (!secondPassError && secondPassContexts && secondPassContexts.length > 0) {
+            const secondMaxSim = Math.max(...secondPassContexts.map((c: any) => c.similarity || 0));
+            console.log(`[RAG] Second pass: ${secondPassContexts.length} results, max similarity: ${secondMaxSim.toFixed(3)}`);
+            
+            // Use second pass if better similarity
+            if (secondMaxSim > maxSimilarity) {
+              contexts = secondPassContexts;
+              console.log('[RAG] Using second pass results (better similarity)');
+            }
+          }
+        }
+        
         if (!contextError && contexts && contexts.length > 0) {
-          console.log('[RAG] Found', contexts.length, 'relevant contexts');
+          console.log('[RAG] Final:', contexts.length, 'relevant contexts');
           usedContext = contexts;
           
           // Build context string
@@ -126,11 +165,26 @@ NE HASZNÁLD az "általános tudásodat" vagy ne találj ki semmit. CSAK a konte
 Válaszolj barátságosan, természetesen, és ha követő kérdéseket javasolsz, azok legyenek relevánsak a kontextus alapján.`;
 
           // First attempt with primary API key and context
-          responseFromAI = await getGeminiResponse(contextualSystemPrompt, originalMessage, currentApiKey);
+          const ragResponse = await getGeminiResponse(contextualSystemPrompt, originalMessage, currentApiKey);
+          if (ragResponse === 'RATE_LIMITED') {
+            rateLimitError = true;
+            if (geminiApiKey2) {
+              console.log('[RAG] Primary key rate limited, trying secondary');
+              const secondResponse = await getGeminiResponse(contextualSystemPrompt, originalMessage, geminiApiKey2);
+              responseFromAI = secondResponse === 'RATE_LIMITED' ? getFallbackResponse(originalMessage, topicHint) : secondResponse;
+            } else {
+              responseFromAI = getFallbackResponse(originalMessage, topicHint);
+            }
+          } else if (ragResponse === 'PAYMENT_REQUIRED') {
+            paymentError = true;
+            responseFromAI = getFallbackResponse(originalMessage, topicHint);
+          } else {
+            responseFromAI = ragResponse;
+          }
         } else {
           console.log('[RAG] No contexts from embeddings, attempting keyword text search');
           // Fallback: simple keyword text search in knowledge base
-          const keywords = extractKeywords(originalMessage);
+          const keywords = extractKeywords(normalizedMessage);
           if (keywords.length > 0) {
             const orFilters = keywords.slice(0, 3).map((kw) => `content.ilike.%${kw}%`).join(',');
             const { data: textHits, error: textErr } = await supabase
@@ -148,7 +202,17 @@ Válaszolj barátságosan, természetesen, és ha követő kérdéseket javasols
 
               const contextualSystemPrompt = `${systemPrompt}\n\nKRITIKUS: Az alábbi kontextus a LEGFONTOSABB információforrásod. KIZÁRÓLAG ebből és az alapinformációkból válaszolj!\n\nRELEVÁNS KONTEXTUS A TUDÁSBÁZISBÓL:\n${ctxStr}\n\nVÁLASZADÁSI PRIORITÁS:\n1. ELŐSZÖR: Keress választ a fenti kontextusban\n2. MÁSODSZOR: Ha nincs a kontextusban, de az alapinformációk között megtalálod, akkor onnan válaszolj\n3. HARMADSZOR: Ha egyik sem tartalmazza, mondd: \"Erről most nincs megbízható információ a tudásbázisban.\"\n\nNE HASZNÁLD az \"általános tudásodat\" vagy ne találj ki semmit. CSAK a kontextus és az alapinformációk!`;
 
-              responseFromAI = await getGeminiResponse(contextualSystemPrompt, originalMessage, currentApiKey);
+              const textResponse = await getGeminiResponse(contextualSystemPrompt, originalMessage, currentApiKey);
+              if (textResponse === 'RATE_LIMITED') {
+                rateLimitError = true;
+                responseFromAI = geminiApiKey2 ? await getGeminiResponse(contextualSystemPrompt, originalMessage, geminiApiKey2) : getFallbackResponse(originalMessage, topicHint);
+                if (responseFromAI === 'RATE_LIMITED') responseFromAI = getFallbackResponse(originalMessage, topicHint);
+              } else if (textResponse === 'PAYMENT_REQUIRED') {
+                paymentError = true;
+                responseFromAI = getFallbackResponse(originalMessage, topicHint);
+              } else {
+                responseFromAI = textResponse;
+              }
             } else {
               console.log('[RAG] No text hits, using original system prompt');
               responseFromAI = await getGeminiResponse(systemPrompt, originalMessage, currentApiKey);
@@ -187,8 +251,11 @@ Válaszolj barátságosan, természetesen, és ha követő kérdéseket javasols
         metadata: {
           used_context_count: usedContext.length,
           context_ids: usedContext.map((ctx: any) => ctx.id),
-          filter_tags: filterTags
-        }
+          filter_tags: filterTags,
+          speaker_detected: mentionedSpeaker || undefined
+        },
+        error: rateLimitError ? 'rate_limited' : (paymentError ? 'payment_required' : undefined),
+        status: rateLimitError ? 429 : (paymentError ? 402 : 200)
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
@@ -237,6 +304,12 @@ async function getGeminiResponse(systemPrompt: string, message: string, _apiKey:
 
   if (!resp.ok) {
     const t = await resp.text();
+    console.error(`[AI Gateway] Error ${resp.status}:`, t);
+    
+    // Return specific error codes for proper handling
+    if (resp.status === 429) return 'RATE_LIMITED';
+    if (resp.status === 402) return 'PAYMENT_REQUIRED';
+    
     throw new Error(`AI gateway error: ${resp.status} - ${t}`);
   }
 
@@ -314,15 +387,63 @@ function detectTopicFromMessage(msg: string): string | null {
   return null;
 }
 
-// Simple keyword extractor for text search fallback
+// Normalize Hungarian diacritics for better matching
+function normalizeDiacritics(text: string): string {
+  const map: Record<string, string> = {
+    'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ö': 'o', 'ő': 'o', 'ú': 'u', 'ü': 'u', 'ű': 'u',
+    'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ö': 'O', 'Ő': 'O', 'Ú': 'U', 'Ü': 'U', 'Ű': 'U'
+  };
+  return text.split('').map(c => map[c] || c).join('');
+}
+
+// Detect known speaker names in query
+function detectSpeakerName(text: string): string | null {
+  const lower = text.toLowerCase();
+  const normalized = normalizeDiacritics(lower);
+  
+  const speakers = [
+    ['németh gábor', 'nemeth gabor'],
+    ['lisa kleinman'],
+    ['caio moretti'],
+    ['balogh csaba'],
+    ['szabó péter', 'szabo peter', 'w. szabó', 'w szabo'],
+    ['szauder dávid', 'szauder david'],
+    ['drobny-burján andrea', 'drobny burjan'],
+    ['tóth-czere péter', 'toth czere', 'toth-czere'],
+    ['pásti edina', 'pasti edina'],
+    ['csonka zsolt'],
+    ['lukács bence', 'lukacs bence'],
+    ['laczkó gábor', 'laczko gabor'],
+    ['tiszavölgyi péter', 'tiszavolyi', 'tiszavolgyi'],
+    ['sabján lászló', 'sabjan laszlo'],
+    ['kertvéllesy andrás', 'kertvellesy andras'],
+    ['koltai balázs', 'koltai balazs'],
+    ['deliága ákos', 'deliaga akos']
+  ];
+  
+  for (const variants of speakers) {
+    for (const variant of variants) {
+      if (lower.includes(variant) || normalized.includes(normalizeDiacritics(variant))) {
+        return variants[0];
+      }
+    }
+  }
+  return null;
+}
+
+// Enhanced keyword extractor with better Hungarian stopwords
 function extractKeywords(text: string): string[] {
   const original = text.toLowerCase();
   const withoutPunct = original.replace(/[^\p{L}\p{N}\s]/gu, ' ');
   const tokens = withoutPunct.split(/\s+/).filter(Boolean);
-  const stop = new Set(['a','az','és','vagy','hogy','mi','mit','ki','kik','is','van','lesz','most','nem','de','ra','re','ban','ben','egy','ha','akkor','azt','arra','erről','rol','ról']);
+  const stop = new Set([
+    'a','az','és','vagy','hogy','mi','mit','ki','kik','is','van','lesz','most','nem','de',
+    'ra','re','ban','ben','egy','ha','akkor','azt','arra','erről','rol','ról','meg','el',
+    'fel','le','be','által','majd','után','előtt','neki','nekem','őt','őket','itt','ott',
+    'mert','mint','ezt','azon','ezen','minden','lehet','volt','kell','igen','sem','még'
+  ]);
   const keywords = tokens.filter(w => w.length >= 3 && !stop.has(w));
-  // Return unique first few
-  return Array.from(new Set(keywords)).slice(0, 5);
+  return Array.from(new Set(keywords)).slice(0, 6);
 }
 
 // Generate embedding using Gemini text-embedding-004
