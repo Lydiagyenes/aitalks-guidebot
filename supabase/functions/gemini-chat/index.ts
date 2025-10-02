@@ -39,8 +39,19 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
+    // Get current date and pricing information
+    const currentDate = new Date();
+    const currentPricing = getCurrentPricing(currentDate);
+    const currentDateStr = currentDate.toLocaleDateString('hu-HU', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+
     // AI Talks konferencia specifikus prompt (rövidített a RAG miatt)
     const systemPrompt = `Te az AI Talks konferencia hivatalos asszisztense vagy. A konferencia a HVG és Amazing AI közös szervezésében valósul meg Budapesten 2025. november 20-án.
+
+MAI DÁTUM: ${currentDateStr}
 
 KRITIKUS SZABÁLYOK - KÖTELEZŐ KÖVETNI:
 1. CSAK a rendelkezésre álló kontextus vagy az alábbi alapinformációk alapján válaszolj
@@ -53,12 +64,12 @@ ALAPVETŐ TUDÁS (csak ez és a kontextus):
 - Időpont: 2025. november 20.
 - Helyszín: Bálna, Budapest, Fővám tér 11-12, 1093
 - Téma: "Az AI mint üzlettárs: szemléletváltó konferencia"
-- Jegyvásárlás: Super early bird kedvezmények (szeptember 30-ig)
 
-JEGYTÍPUSOK:
-- BASIC: 35.940 Ft + áfa (teljes napos részvétel)
-- PRÉMIUM: 41.940 Ft + áfa (+ videók, próbahozzáférések)
-- VIP: 71.400 Ft + áfa (+ VIP belépés, könyvek, extrák)
+AKTUÁLIS JEGYÁRAK (${currentPricing.period}):
+- BASIC: ${currentPricing.basic} Ft + áfa (teljes napos részvétel)
+- PRÉMIUM: ${currentPricing.premium} Ft + áfa (+ videók, próbahozzáférések)
+- VIP: ${currentPricing.vip} Ft + áfa (+ VIP belépés, könyvek, extrák)
+${currentPricing.note ? `\nMEGJEGYZÉS: ${currentPricing.note}` : ''}
 
 VÁLASZADÁSI STÍLUS:
 - Tegezd a felhasználót, barátságos hangnem
@@ -450,6 +461,77 @@ Válaszolj barátságosan, természetesen, és ha követő kérdéseket javasols
     });
   }
 });
+
+// Helper function to get current pricing based on date
+interface PricingInfo {
+  period: string;
+  basic: number;
+  premium: number;
+  vip: number;
+  note?: string;
+}
+
+function getCurrentPricing(date: Date): PricingInfo {
+  const year = date.getFullYear();
+  const month = date.getMonth(); // 0-indexed (0 = január, 8 = szeptember, 9 = október, 10 = november)
+  const day = date.getDate();
+  
+  // Super Early Bird: szeptember 30-ig (2024 or 2025)
+  if ((year === 2024 && (month < 8 || (month === 8 && day <= 30))) ||
+      (year === 2025 && month < 8)) {
+    return {
+      period: 'Super Early Bird (szeptember 30-ig)',
+      basic: 35940,
+      premium: 41940,
+      vip: 71400,
+      note: 'Utolsó esélyek a legnagyobb kedvezményre!'
+    };
+  }
+  
+  // Early Bird: október 1-19 (35% kedvezmény)
+  if ((year === 2024 || year === 2025) && 
+      month === 9 && day >= 1 && day <= 19) {
+    return {
+      period: 'Early Bird (35% kedvezmény, október 1-19-ig)',
+      basic: 38935,
+      premium: 45435,
+      vip: 77350,
+      note: '35% kedvezmény - korlátozott ideig!'
+    };
+  }
+  
+  // Last Call: október 20 - november 2 (25% kedvezmény)
+  if ((year === 2024 || year === 2025) && 
+      ((month === 9 && day >= 20) || (month === 10 && day >= 1 && day <= 2))) {
+    return {
+      period: 'Last Call (25% kedvezmény, október 20 - november 2)',
+      basic: 44925,
+      premium: 52425,
+      vip: 89250,
+      note: 'Utolsó kedvezményes időszak!'
+    };
+  }
+  
+  // Full Price: november 3-tól
+  if ((year === 2024 || year === 2025) && 
+      ((month === 10 && day >= 3) || month > 10)) {
+    return {
+      period: 'Teljes árú jegyek (november 3-tól)',
+      basic: 59900,
+      premium: 69900,
+      vip: 119000,
+      note: 'Teljes árú jegyek - ne késlekedj!'
+    };
+  }
+  
+  // Default fallback (should not happen, but just in case)
+  return {
+    period: 'Aktuális árak',
+    basic: 59900,
+    premium: 69900,
+    vip: 119000
+  };
+}
 
 // Helper function to call AI via Lovable AI Gateway
 async function getGeminiResponse(systemPrompt: string, message: string, _apiKey: string): Promise<string> {
