@@ -66,7 +66,7 @@ VÁLASZADÁSI STÍLUS:
 - Jegyvásárlást csak minden 5. válaszban említsd
 - Minden válasz végén 1 rövid, témára szabott követő kérdést
 
-HISTORY CONTEXT: ${history ? `Utolsó üzenetek: ${JSON.stringify(history)}` : 'Nincs korábbi kontextus'}
+HISTORY CONTEXT: ${history ? `Utolsó üzenetek: ${JSON.stringify(Array.isArray(history) ? history.slice(-3) : history)}` : 'Nincs korábbi kontextus'}
 TOPIC HINT: ${topicHint || 'általános'}`;
 
     // Extract context from conversation history
@@ -212,8 +212,9 @@ TOPIC HINT: ${topicHint || 'általános'}`;
             }
           }
           
-          console.log('[RAG] Final:', contexts.length, 'relevant contexts');
-          usedContext = contexts;
+          // Limit to top 5 most relevant contexts to avoid context overflow
+          usedContext = contexts.slice(0, 5);
+          console.log('[RAG] Final:', usedContext.length, 'relevant contexts (limited from', contexts.length, ')');
           
           // Build context string
           const contextString = contexts
@@ -270,15 +271,17 @@ Válaszolj barátságosan, természetesen, és ha követő kérdéseket javasols
               .from('knowledge_chunks')
               .select('id, content, tags')
               .or(orFilters)
-              .limit(10);
+              .limit(5);
 
             if (!textErr && textHits && textHits.length > 0) {
               console.log('[RAG] Text search found', textHits.length, 'hits');
               textHits.forEach((hit: any, i: number) => {
                 console.log(`  ${i + 1}. ${hit.content.substring(0, 80)}...`);
               });
-              usedContext = textHits as any[];
-              const ctxStr = textHits
+              // Limit to top 5 text search results
+              usedContext = textHits.slice(0, 5) as any[];
+              console.log('[RAG] Using text search hits:', textHits.length, '→ limited to', usedContext.length, 'results');
+              const ctxStr = usedContext
                 .map((ctx: any, idx: number) => `KONTEXTUS #${idx + 1}:\n${ctx.content}\nCímkék: ${ctx.tags?.join(', ') || ''}\n`)
                 .join('\n---\n');
 
@@ -313,8 +316,15 @@ Válaszolj barátságosan, természetesen, és ha követő kérdéseket javasols
                 const scrapedContent = await scrapeWebsite('https://aitalks.hu');
                 
                 if (scrapedContent) {
+                  // Limit scraped content to 2000 characters to avoid context overflow
+                  const limitedContent = scrapedContent.length > 2000 
+                    ? scrapedContent.substring(0, 2000) + '... [tartalmat lerövidítettük]'
+                    : scrapedContent;
+                  
                   console.log('[SCRAPE] Successfully scraped website, using as context');
-                  const webCtxPrompt = `${systemPrompt}\n\nKRITIKUS: Az alábbi információ az élő aitalks.hu weboldalról származik (valós időben letöltve):\n\n${scrapedContent}\n\nVÁLASZADÁSI PRIORITÁS:\n1. ELŐSZÖR: Keress választ a fenti webes kontextusban\n2. MÁSODSZOR: Ha nincs a kontextusban, de az alapinformációk között megtalálod, akkor onnan válaszolj\n3. HARMADSZOR: Ha egyik sem tartalmazza, mondd: "Erről most nincs megbízható információ."\n\nNE HASZNÁLD az "általános tudásodat" vagy ne találj ki semmit. CSAK a kontextus és az alapinformációk!`;
+                  console.log('[SCRAPE] Limited content:', scrapedContent.length, '→', limitedContent.length, 'chars');
+                  
+                  const webCtxPrompt = `${systemPrompt}\n\nKRITIKUS: Az alábbi információ az élő aitalks.hu weboldalról származik (valós időben letöltve):\n\n${limitedContent}\n\nVÁLASZADÁSI PRIORITÁS:\n1. ELŐSZÖR: Keress választ a fenti webes kontextusban\n2. MÁSODSZOR: Ha nincs a kontextusban, de az alapinformációk között megtalálod, akkor onnan válaszolj\n3. HARMADSZOR: Ha egyik sem tartalmazza, mondd: "Erről most nincs megbízható információ."\n\nNE HASZNÁLD az "általános tudásodat" vagy ne találj ki semmit. CSAK a kontextus és az alapinformációk!`;
                   
                   const webResponse = await getGeminiResponse(webCtxPrompt, originalMessage, currentApiKey);
                   if (webResponse === 'RATE_LIMITED') {
@@ -353,7 +363,14 @@ Válaszolj barátságosan, természetesen, és ha követő kérdéseket javasols
               console.log('[SCRAPE] Attempting to scrape aitalks.hu (no keywords)');
               const scrapedContent = await scrapeWebsite('https://aitalks.hu');
               if (scrapedContent) {
-                const webCtxPrompt = `${systemPrompt}\n\nKRITIKUS: Az alábbi információ az élő aitalks.hu weboldalról származik (valós időben letöltve):\n\n${scrapedContent}\n\nVÁLASZADÁSI PRIORITÁS:\n1. ELŐSZÖR: Keress választ a fenti webes kontextusban\n2. MÁSODSZOR: Ha nincs a kontextusban, de az alapinformációk között megtalálod, akkor onnan válaszolj\n3. HARMADSZOR: Ha egyik sem tartalmazza, mondd: "Erről most nincs megbízható információ."`;
+                // Limit scraped content to 2000 characters to avoid context overflow
+                const limitedContent = scrapedContent.length > 2000 
+                  ? scrapedContent.substring(0, 2000) + '... [tartalmat lerövidítettük]'
+                  : scrapedContent;
+                
+                console.log('[SCRAPE] Limited content:', scrapedContent.length, '→', limitedContent.length, 'chars');
+                
+                const webCtxPrompt = `${systemPrompt}\n\nKRITIKUS: Az alábbi információ az élő aitalks.hu weboldalról származik (valós időben letöltve):\n\n${limitedContent}\n\nVÁLASZADÁSI PRIORITÁS:\n1. ELŐSZÖR: Keress választ a fenti webes kontextusban\n2. MÁSODSZOR: Ha nincs a kontextusban, de az alapinformációk között megtalálod, akkor onnan válaszolj\n3. HARMADSZOR: Ha egyik sem tartalmazza, mondd: "Erről most nincs megbízható információ."`;
                 const webResponse = await getGeminiResponse(webCtxPrompt, originalMessage, currentApiKey);
                 if (webResponse === 'RATE_LIMITED') {
                   rateLimitError = true;
