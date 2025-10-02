@@ -74,17 +74,17 @@ Filozófia: Az MI nem egy egyszerű eszköz, hanem egy segítőtárs és partner
 
 BASIC (Az induló szint):
 - Teljes ár: 59.900 Ft + áfa
-- Kedvezményes ár: 35.940 Ft + áfa
+- Kedvezményes ár: 38.935 Ft + áfa
 - Tartalma: Teljes napos részvétel, délelőtti előadások és délutáni workshopok, kiállítók és interaktív standok, 30% HVG könyvkupon
 
 PRÉMIUM (A legnépszerűbb):
 - Teljes ár: 69.900 Ft + áfa
-- Kedvezményes ár: 41.940 Ft + áfa
+- Kedvezményes ár: 45.435 Ft + áfa
 - Tartalma: A BASIC csomag tartalma + videófelvételek az előadásokról és workshopokról + 14 napos ingyenes próbaidőszak az Amazing AI Tudástárhoz + részvétel Karen Hao "AI Birodalom" című könyvbemutatóján (november 10.)
 
 VIP (A kiemelt kategória):
 - Teljes ár: 119.000 Ft + áfa
-- Kedvezményes ár: 71.400 Ft + áfa
+- Kedvezményes ár: 77.350 Ft + áfa
 - Tartalma: A PRÉMIUM csomag tartalma + soron kívüli VIP beléptetés + 3000 forint értékű ebédkupon + Shownotes (digitális jegyzetcsomag) + Karen Hao és Németh Gábor könyvei + 30 napos ingyenes próbaidőszak az Amazing AI Tudástárhoz + 1 hónap hvg360 hozzáférés + HVG Klubkártya 2026-ra
 
 ### Kedvezményes időszakok:
