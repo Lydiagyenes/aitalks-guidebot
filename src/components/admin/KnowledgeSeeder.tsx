@@ -42,19 +42,20 @@ export const KnowledgeSeeder: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const payload = useMemo(() => ({
-    title: "AI Talks 2025 Konferencia – Teljes RAG tudásbázis (v3)",
-    tags: [
-      "hu","faq","ticket","jegy","pricing","ár","parking","parkolás",
-      "restaurant","étterem","food","kedvezmények","early-bird","shownote",
-      "logisztika","ruhatár","büfé","vendéglátás","bálna","program","előadók",
-      "workshopok","speakers","előadások","helyszín","megközelítés","dress-code",
-      "öltözet","nyelv","fordítás","vip","premium","basic","amazing-ai","hvg",
-      "célcsoport","solo-magic","team-magic","enterprise-magic"
-    ],
-    source_url: "internal:complete-seed-v3",
-    metadata: { language: "hu", category: "conference-full", source: "pdf-import", version: "3.0" },
-    content: `# AI Talks Konferencia 2025 – Teljes Információs Bázis
+  const payloads = useMemo(() => [
+    {
+      title: "AI Talks 2025 Konferencia – Teljes RAG tudásbázis (v3)",
+      tags: [
+        "hu","faq","ticket","jegy","pricing","ár","parking","parkolás",
+        "restaurant","étterem","food","kedvezmények","early-bird","shownote",
+        "logisztika","ruhatár","büfé","vendéglátás","bálna","program","előadók",
+        "workshopok","speakers","előadások","helyszín","megközelítés","dress-code",
+        "öltözet","nyelv","fordítás","vip","premium","basic","amazing-ai","hvg",
+        "célcsoport","solo-magic","team-magic","enterprise-magic"
+      ],
+      source_url: "internal:complete-seed-v3",
+      metadata: { language: "hu", category: "conference-full", source: "pdf-import", version: "3.0" },
+      content: `# AI Talks Konferencia 2025 – Teljes Információs Bázis
 
 ## 1. ÁLTALÁNOS INFORMÁCIÓK
 
@@ -271,7 +272,102 @@ HVG Klubkártya: VIP jeggyel 2026-ra teljes éves hozzáférés.
 Videófelvételek: PRÉMIUM és VIP jeggyel az előadásokról és workshopokról.
 
 A rendezvény filozófiája: Az "AI Fluency" és a Társintelligencia (Ethan Mollick) koncepciókra épül – az AI mint partner, nem mint eszköz.`
-  }), []);
+    },
+    {
+      title: "Előadások listája - AI Talks 2025",
+      tags: [
+        "hu","előadások","előadók","program","időbeosztás","lista","speakers",
+        "workshop","workshopok","délelőtt","délután","schedule","timetable",
+        "sorold-fel","felsorolás","program-lista"
+      ],
+      source_url: "internal:presentations-list-v1",
+      metadata: { language: "hu", category: "presentations-schedule", source: "structured-list", version: "1.0" },
+      content: `# AI Talks 2025 - Teljes Előadási Program
+
+## DÉLELŐTTI ELŐADÁSOK (Görgei terem)
+
+### 09:05-09:25 | Lisa Kleinman (Make.com)
+**"Ügynökök köztünk – Megbízható no-code munkafolyamatok tervezése"**
+A Make.com terméktervezési vezetője bemutatja, hogyan tervezhetünk megbízható és emberközpontú AI-ügynököket programozói tudás nélkül. Hogyan szolgáljuk ki az ügyfeleket úgy, hogy a kontroll a mi kezünkben marad.
+
+### 09:27-09:47 | Caio Moretti (QConcursos, grupoQ)
+**"Vibe-coding a való világban – Hogyan használhatják a cégek az AI-t a produktivitás növelésére"**
+A brazil edtech óriás vezérigazgatója a "vibe-coding" módszerről, amellyel cége 48 óra alatt 3 millió dollár bevételt ért el. Hogyan gyorsítható fel drámaian a termékfejlesztés AI-jal.
+
+### 09:49-10:09 | Németh Gábor (Amazing AI)
+**"AI Fluency (MI-jártasság): a promptoláson túl. Mentális modellek az AI korában"**
+Az Amazing AI társalapítója az "AI Fluency" gondolkodásmódról, amivel az AI nemcsak eszköz, hanem valódi partner lesz a munkában. Hogyan léphetünk túl a promptoláson.
+
+### 10:11-10:31 | Balogh Csaba (HVG)
+**"Melyek voltak az idei év legjelentősebb AI-történései, és milyen trendek várhatók 2026-ban?"**
+A HVG Tech+Tudomány rovatvezetője összefoglalja az idei év legfontosabb AI-fejleményeit és előrejelzi a 2026-os trendeket. Hogyan gondolkodjunk 3 lépéssel a piac előtt.
+
+### 10:31-10:51 | Kerekasztal-beszélgetés
+**"AI és vállalkozás: lehetőségek, realitás és kihívások"**
+Moderátor: Koltai Balázs (Genezit)
+Résztvevők: Laczkó Gábor (Stylers Group), Deliága Ákos (Talk-a-bot), Balogh Csaba (HVG)
+
+### 10:51-11:11 | W. Szabó Péter (Tengr.ai)
+**"Az AI nem veszi el a munkát? De igen! Eljött az autonóm ügynökök kora"**
+A Tengr.ai alapítója és AI-kutató provokatív előadásban mutatja be, hogyan változtatják meg az autonóm AI-ügynökök a munka világát, és hogyan maradhatunk relevánsak.
+
+### 11:45-12:15 | Szauder Dávid (Médiaművész, MOME)
+**"AI-művészet: Mit jelent mesterséges intelligenciával alkotni?"**
+Látványos, multimédiás előadás a kulisszák mögé. Saját trénelt AI-modellek, stílusreferenciák, technológiai fejlődés, kereskedelmi felhasználás és szerzői jogi kérdések.
+
+---
+
+## DÉLUTÁNI WORKSHOPOK (13:15-től, párhuzamosan több teremben)
+
+### 1. Németh Gábor (Amazing AI)
+**"Én és az AI-csapatom"**
+13:15-14:45 | Görgei terem
+Solo Magic - Hogyan dolgozz együtt több AI-modellel (ChatGPT, Claude, Gemini, Perplexity) úgy, mintha egy csapatot vezényelnél.
+
+### 2. Drobny-Burján Andrea (Béres Gyógyszergyár)
+**"Kódolt kreativitás – Problémamegoldás és innováció 5+1 lépésében az AI segítségével"**
+13:15-14:45
+Solo Magic, Team Magic - Az AI mint kreatív partner. B.I.R.D.S. módszertan a strukturált problémamegoldáshoz.
+
+### 3. Lukács Bence (Supercharge)
+**"AI-automatizációs megoldások építése no-code eszközökkel"**
+13:15-14:15
+Team Magic - Zapier, Make, n8n használata. Workflow-automatizálás élő bemutatóval.
+
+### 4. Tóth-Czere Péter (NEXT Academy)
+**"Human 2.0 – Fenntartható hatékonyság az AI korában"**
+13:15-14:45
+Solo Magic, Team Magic - NEXT módszertan: fejben, rendszerben, AI-ban. Second brain, learning, meetings, csapatmunka.
+
+### 5. Pásti Edina (Just Bee Digital)
+**"Hogyan készíthetsz látványos képeket, videókat, arculati elemeket az AI segítségével?"**
+13:15-14:45
+Solo Magic - AI-képgenerátorok és videókészítő eszközök. Gyakorlati példák, tippek és trükkök.
+
+### 6. Csonka Zsolt (Amazing AI)
+**"Copywriter 2.0: Így válj AI-karmesterré a tartalomgyártásban"**
+15:15-16:45
+Solo Magic - AI-asszisztált tartalomkészítés. 6 lépéses munkafolyamat az ember és az AI együttműködésére.
+
+### 7. Laczkó Gábor & Tiszavólgyi Péter (Stylers Group)
+**"AI stratégia 5 lépésben – gyakorlati workshop vállalati döntéshozóknak"**
+13:15-14:45
+Enterprise Magic, Team Magic - Helyzetfelmérés, use case-ek, priorizálás, megtérülés becslése, roadmap. SIPOC modell.
+
+### 8. Sabján László & Kertvéllesy András (AI Squad)
+**"Voice AI: a mesterséges intelligencia ügyfélszolgálati alkalmazása"**
+15:15-16:45
+Enterprise Magic, Team Magic - Hangalapú AI az ügyfélszolgálatban. Use case kiválasztás, ROI kalkuláció, hibrid megoldások, integráció.
+
+---
+
+## CÉLCSOPORTOK
+
+**SOLO MAGIC:** Egyéni vállalkozók, szabadúszók (produktivitás, tartalomgyártás, énmárkaépítés)
+**TEAM MAGIC:** Kis- és mikrovállalkozások (AI-ügynökök építése, sales, projektmenedzsment)
+**ENTERPRISE MAGIC:** Közép- és nagyvállalatok (AI bevezetés, compliance, szervezeti kultúra)`
+    }
+  ], []);
 
   const onSeed = async () => {
     if (!token) {
@@ -280,26 +376,35 @@ A rendezvény filozófiája: Az "AI Fluency" és a Társintelligencia (Ethan Mol
     }
     setLoading(true);
     try {
-      const res = await fetch(
-        "https://jugxnvkjyzgepkzzqjwl.functions.supabase.co/kb-upsert",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-admin-token": token,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      let totalChunks = 0;
+      const results: string[] = [];
 
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data?.error || `Hiba történt (${res.status})`);
+      // Upload all payloads sequentially
+      for (const payload of payloads) {
+        const res = await fetch(
+          "https://jugxnvkjyzgepkzzqjwl.functions.supabase.co/kb-upsert",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-admin-token": token,
+            },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data?.error || `Hiba történt (${res.status})`);
+        }
+
+        totalChunks += data.chunks_created || 0;
+        results.push(`${payload.title}: ${data.chunks_created} chunk`);
       }
 
       toast({
         title: "Sikeres feltöltés",
-        description: `Elem ID: ${data.item_id} • Létrehozott szeletek: ${data.chunks_created}`,
+        description: `${payloads.length} elem feltöltve, összesen ${totalChunks} chunk létrehozva`,
       });
       setOpen(false);
       setToken("");
