@@ -631,7 +631,8 @@ function detectTopicFromMessage(msg: string): string | null {
   if (/(előadó|előad|speaker|ki beszél|kik adnak elő)/i.test(m)) return 'speaker';
   if (/(parkol|garázs|parkoló|parking)/i.test(m)) return 'parking';
   if (/(jegy|ár|ticket|vip|prémium|basic)/i.test(m)) return 'ticket';
-  if (/(program|menetrend|schedule|időpont)/i.test(m)) return 'program';
+  // Improved: detect "list/enumerate" queries → map to 'program'
+  if (/(sorold fel|felsorol|lista|mik az előadások|milyen előadások|program|menetrend|schedule|időpont)/i.test(m)) return 'program';
   if (/(workshop|műhely)/i.test(m)) return 'workshop';
   if (/(étterem|ebéd|restaurant|food)/i.test(m)) return 'restaurant';
   if (/(helyszín|megközelítés|location|venue|bálna)/i.test(m)) return 'location';
@@ -852,13 +853,21 @@ function expandQueryWithContext(query: string, historyContext: { speakers: strin
   const hasPronouns = /\b(ő|őt|őnek|az|annak|ennek|ez|ebből|arról|erről)\b/.test(lower);
   const hasTimeQuestion = /\b(mikor|hánytól|hánykor|időpont)\b/.test(lower);
   const hasVagueReference = /\b(előadás|workshop|beszél|tart)\b/.test(lower) && !detectSpeakerName(lower);
+  // Improved: detect "list/enumerate" queries
+  const hasListQuery = /\b(sorold fel|felsorol|lista|milyen előadások|mik az előadások)\b/.test(lower);
   
   // If query is complete and specific, return as-is
-  if (!hasPronouns && !hasVagueReference && query.length > 15) {
+  if (!hasPronouns && !hasVagueReference && !hasListQuery && query.length > 15) {
     return query;
   }
   
   let expandedQuery = query;
+  
+  // Expand list queries with synonyms for better embedding similarity
+  if (hasListQuery) {
+    console.log(`[Query Expansion] List query detected, adding synonyms`);
+    expandedQuery = `${query} előadások program menetrend schedule lista`;
+  }
   
   // Expand with speaker names if available
   if ((hasPronouns || hasVagueReference || hasTimeQuestion) && historyContext.speakers.length > 0) {
