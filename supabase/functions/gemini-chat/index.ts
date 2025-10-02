@@ -69,13 +69,20 @@ VÁLASZADÁSI STÍLUS:
 HISTORY CONTEXT: ${history ? `Utolsó üzenetek: ${JSON.stringify(history)}` : 'Nincs korábbi kontextus'}
 TOPIC HINT: ${topicHint || 'általános'}`;
 
+    // Extract context from conversation history
+    const historyContext = extractHistoryContext(history || []);
+    console.log('[Entity Resolution] History context:', historyContext);
+    
+    // Expand query with history context (resolve pronouns, add missing entities)
+    const expandedQuery = expandQueryWithContext(originalMessage, historyContext);
+    
     // Normalize query and detect speaker names
-    const normalizedMessage = normalizeDiacritics(originalMessage);
-    const mentionedSpeaker = detectSpeakerName(normalizedMessage);
+    const normalizedMessage = normalizeDiacritics(expandedQuery);
+    const mentionedSpeaker = detectSpeakerName(normalizedMessage) || (historyContext.speakers.length > 0 ? historyContext.speakers[0] : null);
     
     // Map topic_hint to tags for RAG filtering + server-side topic detection
     const initialTags = mapTopicToTags(topicHint);
-    const detectedTopic = detectTopicFromMessage(originalMessage);
+    const detectedTopic = detectTopicFromMessage(expandedQuery);
     let filterTags = initialTags ?? (detectedTopic ? mapTopicToTags(detectedTopic) : null);
     
     // If speaker name detected, skip tag filtering for broader search
@@ -125,15 +132,15 @@ TOPIC HINT: ${topicHint || 'általános'}`;
         // Fall through to normal processing if scraping didn't work
       }
       
-      // Generate embedding for the user's message
-      console.log('[RAG] Generating embedding for query:', originalMessage);
-      const queryEmbedding = await generateEmbedding(originalMessage, currentApiKey);
+      // Generate embedding for the EXPANDED query (with context)
+      console.log('[RAG] Generating embedding for expanded query:', expandedQuery);
+      const queryEmbedding = await generateEmbedding(expandedQuery, currentApiKey);
       
       if (queryEmbedding) {
         console.log('[RAG] Embedding generated successfully, dimensions:', queryEmbedding.length);
         
         // FIRST PASS: Retrieve relevant knowledge chunks with tag filtering
-        const firstPassCount = mentionedSpeaker ? 20 : 15; // More results if speaker mentioned
+        const firstPassCount = mentionedSpeaker ? 30 : 20; // Increased: 30 for speakers, 20 for general
         console.log('[RAG] First pass with match_count:', firstPassCount, ', filter_tags:', filterTags);
         let { data: contexts, error: contextError } = await supabase.rpc('match_knowledge', {
           query_embedding: queryEmbedding,
@@ -184,8 +191,8 @@ TOPIC HINT: ${topicHint || 'általános'}`;
           const maxSim = Math.max(...contexts.map((c: any) => c.similarity || 0));
           console.log(`[RAG] Using contexts, max similarity: ${maxSim.toFixed(3)}`);
           
-          // Only scrape if really low quality AND no speaker mentioned
-          if (maxSim < 0.32 && !mentionedSpeaker) {
+          // Lower threshold: only scrape if VERY low quality (0.20) AND no speaker mentioned
+          if (maxSim < 0.20 && !mentionedSpeaker) {
             console.log(`[RAG] Context quality very low (max: ${maxSim.toFixed(3)}), attempting web scraping`);
             const scrapedContent = await scrapeWebsite('https://aitalks.hu');
             if (scrapedContent) {
@@ -694,4 +701,88 @@ async function generateEmbedding(text: string, apiKey: string): Promise<number[]
     console.error('[Embedding] Error generating embedding:', error);
     return null;
   }
+}
+
+// Extract entities and context from conversation history
+function extractHistoryContext(history: any[]): { speakers: string[], topics: string[], lastUserMessage: string } {
+  const speakers = new Set<string>();
+  const topics = new Set<string>();
+  let lastUserMessage = '';
+  
+  if (!history || history.length === 0) {
+    return { speakers: [], topics: [], lastUserMessage: '' };
+  }
+  
+  // Analyze last 5 messages for context
+  const recentHistory = history.slice(-5);
+  
+  for (const msg of recentHistory) {
+    const content = (msg.content || '').toLowerCase();
+    
+    // Track last user message
+    if (msg.role === 'user') {
+      lastUserMessage = msg.content || '';
+    }
+    
+    // Extract speaker names
+    const speaker = detectSpeakerName(content);
+    if (speaker) {
+      speakers.add(speaker);
+    }
+    
+    // Extract topics
+    const topic = detectTopicFromMessage(content);
+    if (topic) {
+      topics.add(topic);
+    }
+  }
+  
+  return {
+    speakers: Array.from(speakers),
+    topics: Array.from(topics),
+    lastUserMessage
+  };
+}
+
+// Expand query with context from history (resolve pronouns and references)
+function expandQueryWithContext(query: string, historyContext: { speakers: string[], topics: string[], lastUserMessage: string }): string {
+  const lower = query.toLowerCase();
+  const normalized = normalizeDiacritics(lower);
+  
+  // Check for pronouns and references that need expansion
+  const hasPronouns = /\b(ő|őt|őnek|az|annak|ennek|ez|ebből|arról|erről)\b/.test(lower);
+  const hasTimeQuestion = /\b(mikor|hánytól|hánykor|időpont)\b/.test(lower);
+  const hasVagueReference = /\b(előadás|workshop|beszél|tart)\b/.test(lower) && !detectSpeakerName(lower);
+  
+  // If query is complete and specific, return as-is
+  if (!hasPronouns && !hasVagueReference && query.length > 15) {
+    return query;
+  }
+  
+  let expandedQuery = query;
+  
+  // Expand with speaker names if available
+  if ((hasPronouns || hasVagueReference || hasTimeQuestion) && historyContext.speakers.length > 0) {
+    const speakerName = historyContext.speakers[0]; // Use most recent speaker
+    console.log(`[Query Expansion] Adding speaker: ${speakerName}`);
+    
+    // Smart expansion based on query type
+    if (hasTimeQuestion) {
+      expandedQuery = `${speakerName} előadás ${query}`;
+    } else if (/\b(előadás|beszél|tart)\b/.test(lower)) {
+      expandedQuery = `${speakerName} ${query}`;
+    } else {
+      expandedQuery = `${query} ${speakerName}`;
+    }
+  }
+  
+  // Expand with topic context if helpful
+  if (historyContext.topics.length > 0 && expandedQuery.length < 30) {
+    const topic = historyContext.topics[0];
+    console.log(`[Query Expansion] Adding topic context: ${topic}`);
+    expandedQuery = `${expandedQuery} ${topic}`;
+  }
+  
+  console.log(`[Query Expansion] Original: "${query}" → Expanded: "${expandedQuery}"`);
+  return expandedQuery.trim();
 }
