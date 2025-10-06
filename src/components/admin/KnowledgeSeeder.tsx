@@ -54,7 +54,8 @@ export const KnowledgeSeeder: React.FC = () => {
         "célcsoport","solo-magic","team-magic","enterprise-magic",
         "kutyabarát","kutya","pet-friendly","létszám","várható-közönség","várható-létszám",
         "tudástár","amazing-ai-tudástár","tananyag","képzés","learning","oktatás",
-        "közösség","workshopok-online","előfizetés","szakértők","esettanulmányok"
+        "közösség","workshopok-online","előfizetés","szakértők","esettanulmányok",
+        "kapcsolat","ügyfélszolgálat","email","telefon","contact","elérhetőség","customer-service"
       ],
       source_url: "internal:complete-seed-v3",
       metadata: { language: "hu", category: "conference-full", source: "pdf-import", version: "3.0" },
@@ -258,11 +259,20 @@ Média partner: HVG
 
 Kóstoltató partnerek: Szaffi, Samurai Shoelace, Tejmadár
 
-## 8. KAPCSOLÓDÓ LINKEK
+## 8. KAPCSOLAT ÉS HASZNOS LINKEK
 
-- Hivatalos weboldal és jegyvásárlás: https://aitalks.hu/
-- Webinar: https://aitalks.hu/uzleti-attores-webinar
-- Shownotes: https://aitalks.hu/ai-talks-shownotes
+### Ügyfélszolgálat és kapcsolattartás
+
+Ha kérdésed van a konferenciával, a jegyekkel vagy bármilyen egyéb témával kapcsolatban, keress minket bizalommal:
+
+- **Email**: info@aitalks.hu
+- **Telefon**: +36 (1) 436 2442
+
+### Hasznos linkek
+
+- **Hivatalos honlap**: [aitalks.hu](https://aitalks.hu)
+- **Show Notes**: [aitalks.hu/ai-talks-shownotes](https://aitalks.hu/ai-talks-shownotes)
+- **Üzleti áttörés webinar**: [aitalks.hu/uzleti-attores-webinar](https://aitalks.hu/uzleti-attores-webinar)
 
 ## 9. TOVÁBBI INFORMÁCIÓK
 
