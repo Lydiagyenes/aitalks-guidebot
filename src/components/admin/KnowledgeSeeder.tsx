@@ -52,7 +52,9 @@ export const KnowledgeSeeder: React.FC = () => {
         "workshopok","speakers","előadások","helyszín","megközelítés","dress-code",
         "öltözet","nyelv","fordítás","vip","premium","basic","amazing-ai","hvg",
         "célcsoport","solo-magic","team-magic","enterprise-magic",
-        "kutyabarát","kutya","pet-friendly","létszám","várható-közönség","várható-létszám"
+        "kutyabarát","kutya","pet-friendly","létszám","várható-közönség","várható-létszám",
+        "tudástár","amazing-ai-tudástár","tananyag","képzés","learning","oktatás",
+        "közösség","workshopok-online","előfizetés","szakértők","esettanulmányok"
       ],
       source_url: "internal:complete-seed-v3",
       metadata: { language: "hu", category: "conference-full", source: "pdf-import", version: "3.0" },
@@ -264,7 +266,38 @@ Kóstoltató partnerek: Szaffi, Samurai Shoelace, Tejmadár
 
 ## 9. TOVÁBBI INFORMÁCIÓK
 
-Amazing AI Tudástár: A PRÉMIUM jegy 14 napos, a VIP jegy 30 napos ingyenes hozzáférést biztosít.
+### Általános információk
+- Az AI Talks konferencia hivatalos nyelve magyar
+- Az előadások magyarul zajlanak
+- Nincs szimultán tolmácsolás
+
+### Amazing AI Tudástár - Exkluzív hozzáférés
+
+Az **Amazing AI Tudástár** egy komplett online oktatási platform, amely a PRÉMIUM és VIP jegytípusok exkluzív része:
+
+**🎯 Mit tartalmaz a Tudástár?**
+- **Naprakész, gyakorlatias AI-tudás** a legjobb hazai szakértőktől
+- Minden, amire szükséged lehet ahhoz, hogy lépést tarts a mesterséges intelligencia rohamosan fejlődő világával
+- **Azonnal alkalmazható tippek** - 100% valós tapasztalatok
+- Könnyen érthetően megfogalmazott tartalmak
+- **Hetente frissülő, naprakész** anyagok
+
+**📚 A platform előnyei:**
+- **Optimalizált, strukturált tananyag** - gyorsabb haladás
+- **Közvetlen hozzáférés szakértőkhöz** - élő workshopok részvételi lehetőség
+- **Logikusan felépített, egymásra épülő modulok**
+- **Aktív közösség** - tapasztalatcsere lehetősége más AI-érdeklődőkkel
+- **Befektetés, ami gyorsan megtérül** a hatékony tudásátadás révén
+- **Egyéni igényekre szabható tanulási út**
+- **Bőséges valós esettanulmány és sikertörténet** gyűjtemény
+
+**⏰ Hozzáférési időtartam:**
+- **PRÉMIUM jegy**: 14 nap teljes hozzáférés az Amazing AI Tudástárhoz
+- **VIP jegy**: 30 nap teljes hozzáférés az Amazing AI Tudástárhoz
+
+A hozzáférés a jegy megvásárlását követően azonnal aktiválódik.
+
+### Egyéb exkluzív tartalmak
 
 Karen Hao könyvbemutató: November 10-én, PRÉMIUM és VIP jeggyel részt lehet venni.
 
