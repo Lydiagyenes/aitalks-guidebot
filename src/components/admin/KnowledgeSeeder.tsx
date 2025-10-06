@@ -51,7 +51,8 @@ export const KnowledgeSeeder: React.FC = () => {
         "logisztika","ruhatár","büfé","vendéglátás","bálna","program","előadók",
         "workshopok","speakers","előadások","helyszín","megközelítés","dress-code",
         "öltözet","nyelv","fordítás","vip","premium","basic","amazing-ai","hvg",
-        "célcsoport","solo-magic","team-magic","enterprise-magic"
+        "célcsoport","solo-magic","team-magic","enterprise-magic",
+        "kutyabarát","kutya","pet-friendly","létszám","várható-közönség","várható-létszám"
       ],
       source_url: "internal:complete-seed-v3",
       metadata: { language: "hu", category: "conference-full", source: "pdf-import", version: "3.0" },
@@ -106,6 +107,10 @@ Jegyvásárlás: https://aitalks.hu/ – A jegyeket cégnévre is lehet kérni, 
 
 ### Helyszín: Bálna Budapest
 A Petőfi-híd (Boráros tér) és a Szabadság-híd (Fővám tér) között helyezkedik el.
+
+🐕 **Kutyabarát helyszín**: A Bálna kutyabarát, vendégek hozhatnak magukkal kutyát is a rendezvényre.
+
+👥 **Várható létszám**: Körülbelül 800 fő részvételével számolunk (800 jegy értékesítése a cél).
 
 ### Megközelítés:
 Tömegközlekedéssel: M4-es metró; 2-es, 4-6-os, 47-es, 49-es villamosok; valamint számos autóbusz, HÉV és trolibusz.
